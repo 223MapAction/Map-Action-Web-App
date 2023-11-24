@@ -6,7 +6,8 @@ It is used for the api and the web application
 ### Setup
 - Clone the repository
 - setup the virtual env first 
-it can be doing with the following command:
+it can be doing with the following command
+
 **On Linux, MacOS:**
 ```bash
 python3 -m venv env_name
@@ -37,7 +38,8 @@ python manage.py migrate
 python manage.py runserver 
 ```
 it running on http:127.0.0.1:8000/
-**Note:**
+
+##### Note
 if your system is Linux or MacOS
 you have to add 3 on python
 example python3 manage.py runserver

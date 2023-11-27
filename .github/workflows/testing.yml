@@ -1,1 +1,46 @@
+name: django-test
+
+
+
+on:
+  push:
+    branches:
+      - main
+    
+  pull_request:
+    branches:
+      - dev
+
+
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+
+
+    steps:
+      - uses : actions/checkout@v2
+      - name : Set up Python 3.10
+        uses : actions:setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: install dependencies
+        run: | 
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8
+      - name: Coverage report
+        run: |
+          pip install coverage
+          coverage run manage.py test
+          coverage report
+      - name: Django Testing
+        run : |
+          python3 manage.py test
+
 

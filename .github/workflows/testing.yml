@@ -35,6 +35,7 @@ jobs:
         working-directory: MapAction
         run: |
           pip install coverage
+          pip install importlib-resources
           coverage run manage.py test
           coverage report
 

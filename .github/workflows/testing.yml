@@ -34,6 +34,7 @@ jobs:
         run: |
           pip install flake8
       - name: Coverage report
+        working-directory: MapAction
         run: |
           pip install coverage
           coverage run manage.py test

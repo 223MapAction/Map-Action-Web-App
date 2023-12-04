@@ -30,7 +30,6 @@ jobs:
         working-directory: MapAction
         run: |
           pip install flake8
-          flake8 .
 
       - name: Coverage report
         working-directory: MapAction

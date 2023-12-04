@@ -1,46 +1,45 @@
 name: django-test
 
-
-
 on:
   push:
     branches:
       - main
-    
   pull_request:
     branches:
       - dev
-
-
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-
-
     steps:
-      - uses : actions/checkout@v2
-      - name : Set up Python 3.11
-        uses : actions/setup-python@v2
-        with:
-          python-version: 3.12.0
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-      - name: install dependencies
-        run: | 
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.0
+
+      - name: Install Dependencies
+        run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
       - name: Lint with flake8
+        working-directory: MapAction
         run: |
           pip install flake8
+          flake8 .
+
       - name: Coverage report
         working-directory: MapAction
         run: |
           pip install coverage
           coverage run manage.py test
           coverage report
+
       - name: Django Testing
-        run : |
-          python3 manage.py test
-
-
+        working-directory: MapAction
+        run:
+          python manage.py test

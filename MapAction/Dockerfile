@@ -12,6 +12,8 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # Run linting with flake8
+WORKDIR /app/MapAction
+
 RUN pip install flake8
 RUN flake8 .
 

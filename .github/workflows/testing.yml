@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Build and Run Docker Compose
-        working-directory: /app/MapAction
+        working-directory: MapAction
         run: |
           docker-compose up --build
       

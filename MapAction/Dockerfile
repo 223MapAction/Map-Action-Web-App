@@ -21,6 +21,7 @@ RUN flake8 .
 
 # Install coverage and run tests
 RUN pip install coverage
+RUN ls
 RUN coverage run manage.py test
 RUN coverage report
 

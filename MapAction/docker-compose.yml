@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  django-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"  # Adjust the port as needed
+    volumes:
+      - .:/app        # Mount the current directory to /app in the container

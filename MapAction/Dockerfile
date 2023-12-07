@@ -14,7 +14,7 @@ RUN pip install -r requirements.txt
 # Run linting with flake8
 
 RUN pip install flake8
-RUN flake8 --ignore=E501,F401 ./MapApp
+RUN flake8 --ignore=E501,F401 ./Mapapi
 
 # Set the working directory to /app/MapAction
 

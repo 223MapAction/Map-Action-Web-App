@@ -11,18 +11,17 @@ COPY . /app
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Set the working directory to /app/MapAction
-WORKDIR /MapAction
 # Run linting with flake8
+WORKDIR /app
+
 RUN pip install flake8
 RUN flake8 .
 
-
+# Set the working directory to /app/MapAction
+WORKDIR /app
 
 # Install coverage and run tests
-
 RUN pip install coverage
-RUN cd ..
 RUN coverage run manage.py test
 RUN coverage report
 

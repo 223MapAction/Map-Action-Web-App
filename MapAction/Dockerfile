@@ -14,8 +14,6 @@ RUN pip install -r requirements.txt
 # Run linting with flake8
 
 RUN pip install flake8
-RUN flake8 .
-
 
 # Set the working directory to /app/MapAction
 

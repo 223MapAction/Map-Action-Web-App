@@ -6,3 +6,4 @@ django-crispy-forms == 2.1
 pyscopg2 == 66.0.2
 crispy-bootstrap4 == 2023.1
 importlib-resources==5.12
+Pillow==10.1.0

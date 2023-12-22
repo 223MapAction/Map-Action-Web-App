@@ -16,7 +16,7 @@ RUN pip install -r requirements.txt
 RUN pip install flake8
 
 # Set the working directory to /app/MapAction
-
+ENV TEST_POSTGRES_DB=test_default_database
 # Install coverage and run tests
 RUN pip install coverage
 RUN coverage run manage.py test

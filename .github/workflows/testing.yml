@@ -19,5 +19,5 @@ jobs:
       - name: Build and Run Docker Compose
         working-directory: MapAction
         run: |
-          docker-compose up --build
+          docker-compose up  --build -d
       

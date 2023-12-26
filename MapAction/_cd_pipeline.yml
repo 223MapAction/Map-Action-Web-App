@@ -1,7 +1,7 @@
 version: '3'
 
-services:
 
+services:
 
 
   postgres-db:
@@ -37,7 +37,7 @@ services:
       depends_on:
         - postgres-db
       networks:
-          micro-services-network:
+        micro-services-network:
           ipv4_address: 192.168.0.3
 
   pgadmin:
@@ -52,21 +52,21 @@ services:
     ports:
       - "5050:80"
     networks:
-        micro-services-network:
+      micro-services-network:
         ipv4_address: 192.168.0.4
 
 
-    nginx:
-      container_name: api_getway
-      build:
-        context: ./services/nginx/
-      ports:
-        - 80:80
-      volumes:
-        - ./services/nginx/conf.d/:/etc/nginx/conf.d/
-      networks:
-          micro-services-network:
-          ipv4_address: 192.168.0.5
+  nginx:
+    container_name: api_getway
+    build:
+      context: ./services/nginx/
+    ports:
+      - 80:80
+    volumes:
+      - ./services/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      micro-services-network:
+        ipv4_address: 192.168.0.5
         
 
 networks:

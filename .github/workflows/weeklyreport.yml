@@ -1,0 +1,14 @@
+name: state report
+
+on:
+    schedule:
+        - cron: '0 0 1 1-12 *'
+    workflow_dispatch:
+
+
+jobs:
+    test-schedule:
+        runs-on: self-hosted
+        steps:
+          - name: hello world
+            run: echo "Hello world"

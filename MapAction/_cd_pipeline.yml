@@ -1,0 +1,79 @@
+version: '3'
+
+services:
+
+
+
+  postgres-db:
+      build:
+        context: ./services/db/
+      env_file:
+        - ./.env/.dev.env
+      ports:
+        - "5432:5432"
+      volumes:
+        - ./:/data
+        #- ./data/db:/var/lib/postgresql/data
+      networks:
+        micro-services-network:
+         ipv4_address: 192.168.0.2
+
+  api-server:
+      container_name: api_server
+      build:
+        context: ./services/api/
+        dockerfile: Dockerfile
+      command: >
+            sh -c "python3 manage.py makemigrations &&
+                    python3 manage.py migrate &&
+                  python3 manage.py wait_for_db &&
+                  gunicorn backend.wsgi:application --bind 0.0.0.0:8000"
+      volumes:
+        - .:/app/
+      expose:
+        - 8000
+      env_file:
+        - ./.env/.dev.env
+      depends_on:
+        - postgres-db
+      networks:
+          micro-services-network:
+          ipv4_address: 192.168.0.3
+
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@root.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    volumes:
+      - ./:/data
+        #- ./data/pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+        micro-services-network:
+        ipv4_address: 192.168.0.4
+
+
+    nginx:
+      container_name: api_getway
+      build:
+        context: ./services/nginx/
+      ports:
+        - 80:80
+      volumes:
+        - ./services/nginx/conf.d/:/etc/nginx/conf.d/
+      networks:
+          micro-services-network:
+          ipv4_address: 192.168.0.5
+        
+
+
+  networks:
+    micro-services-network:
+      ipam:
+        driver: default
+        config:
+          - subnet: "192.168.0.0/24"
+            gateway: "192.168.0.1"

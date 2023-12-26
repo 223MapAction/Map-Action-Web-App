@@ -17,7 +17,6 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Build and Run Docker Compose
-        working-directory: MapAction
         run: |
           docker-compose -f _cd_pipeline.yml up --build -d
       

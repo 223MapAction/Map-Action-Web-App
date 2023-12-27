@@ -32,7 +32,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             last_name=validated_data['last_name'],
             phone=validated_data['phone'],
             is_active=True,
-            adress=validated_data['adress']
+            address=validated_data['address']
         )
         user.set_password(validated_data['password'])
         user.save()

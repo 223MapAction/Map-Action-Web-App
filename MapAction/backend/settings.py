@@ -16,7 +16,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS"),'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS"),'localhost', '127.0.0.1', '192.168.0.2']
 
 
 # Application definition
@@ -33,6 +33,14 @@ INSTALLED_APPS = [
     'Mapapi',
     'crispy_forms',
     'crispy_bootstrap4',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.apple',
+    # 'allauth.socialaccount.providers.linkedin',
+    # 'allauth.socialaccount.providers.twitter_oauth2',
 
 ]
 
@@ -48,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -69,6 +79,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+# ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+SOCIALACCOUNT_QUERY_EMAIL = True
 
 
 # Database
@@ -136,15 +150,70 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-    ]
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+SOCIALACCOUNT_PROVIDERS = {
+'facebook': {
+'METHOD': 'oauth2', # Set to 'js_sdk' to use the Facebook connect SDK
+'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
+'SCOPE': ['email', 'public_profile'],
+'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+'INIT_PARAMS': {'cookie': True},
+'FIELDS': [
+'id',
+'first_name',
+'last_name',
+'middle_name',
+'name',
+'name_format',
+'picture',
+'short_name'
+],
+'EXCHANGE_TOKEN': True,
+'LOCALE_FUNC': 'path.to.callable',
+'VERIFIED_EMAIL': False,
+'VERSION': 'v13.0',
+'GRAPH_API_URL': 'https://graph.facebook.com/v13.0',
+}
+}
+# Enregistrement pour l'application web
+SOCIALACCOUNT_PROVIDERS = {
+'google': {
+'APP': {
+'client_id': os.environ.get('web_client_id'),
+'secret': os.environ.get('web_client_secret'),
+'key': '',
+}
+}
+}
+
+# Enregistrement pour l'application Android
+SOCIALACCOUNT_PROVIDERS = {
+'google': {
+'APP': {
+'client_id': os.environ.get('android_client_id'),
+'secret': ('android_client_secret'),
+'key': '',
+}
+}
+}
+
+# Enregistrement pour l'application iOS
+SOCIALACCOUNT_PROVIDERS = {
+'google': {
+'APP': {
+'client_id': os.environ.get('ios_client_id'),
+'secret': 'ios_client_secret',
+'key': '',
+}
+}
+}
 
 AUTH_USER_MODEL = 'Mapapi.User'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

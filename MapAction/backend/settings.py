@@ -16,7 +16,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS"),'localhost', '127.0.0.1', '192.168.0.2']
+ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS"),'localhost', '127.0.0.1', '192.168.0.2', '192.168.1.26']
 
 
 # Application definition
@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'MapApp',
     'Mapapi',
@@ -57,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 
 ]
 
@@ -79,7 +81,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 # ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 SOCIALACCOUNT_QUERY_EMAIL = True
@@ -206,14 +208,44 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # Enregistrement pour l'application iOS
 SOCIALACCOUNT_PROVIDERS = {
-'google': {
-'APP': {
-'client_id': os.environ.get('ios_client_id'),
-'secret': 'ios_client_secret',
-'key': '',
+    'google': {
+        'APP': {
+            'client_id': os.environ.get('ios_client_id'),
+            'secret': 'ios_client_secret',
+            'key': '',
+        }
+    }
 }
-}
-}
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    '*'
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'PUT',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    '*'
+]
+
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:80",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+
+    
+]
+
 
 AUTH_USER_MODEL = 'Mapapi.User'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

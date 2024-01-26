@@ -13,8 +13,5 @@ asgiref==3.7.2
 pytz==2023.3.post1
 sqlparse==0.4.4
 django-allauth==0.60.0
-<<<<<<< HEAD
 python-decouple==3.8
-=======
 django-cors-headers==4.3.0
->>>>>>> 69d47ea2c4c7561584c41d68f41bb732cb12281b

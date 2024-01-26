@@ -153,6 +153,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+MEDIA_URL = '/uploads/'
+
 
 
 # Default primary key field type
@@ -161,49 +164,49 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SOCIALACCOUNT_PROVIDERS = {
-'facebook': {
-'METHOD': 'oauth2', # Set to 'js_sdk' to use the Facebook connect SDK
-'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
-'SCOPE': ['email', 'public_profile'],
-'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
-'INIT_PARAMS': {'cookie': True},
-'FIELDS': [
-'id',
-'first_name',
-'last_name',
-'middle_name',
-'name',
-'name_format',
-'picture',
-'short_name'
-],
-'EXCHANGE_TOKEN': True,
-'LOCALE_FUNC': 'path.to.callable',
-'VERIFIED_EMAIL': False,
-'VERSION': 'v13.0',
-'GRAPH_API_URL': 'https://graph.facebook.com/v13.0',
-}
+    'facebook': {
+        'METHOD': 'oauth2', # Set to 'js_sdk' to use the Facebook connect SDK
+        'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
+        'SCOPE': ['email', 'public_profile'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': [
+        'id',
+        'first_name',
+        'last_name',
+        'middle_name',
+        'name',
+        'name_format',
+        'picture',
+        'short_name'
+        ],
+        'EXCHANGE_TOKEN': True,
+        'LOCALE_FUNC': 'path.to.callable',
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v13.0',
+        'GRAPH_API_URL': 'https://graph.facebook.com/v13.0',
+    }
 }
 # Enregistrement pour l'application web
 SOCIALACCOUNT_PROVIDERS = {
-'google': {
-'APP': {
-'client_id': os.environ.get('web_client_id'),
-'secret': os.environ.get('web_client_secret'),
-'key': '',
-}
-}
+    'google': {
+        'APP': {
+            'client_id': os.environ.get('web_client_id'),
+            'secret': os.environ.get('web_client_secret'),
+            'key': '',
+        }
+    }
 }
 
 # Enregistrement pour l'application Android
 SOCIALACCOUNT_PROVIDERS = {
-'google': {
-'APP': {
-'client_id': os.environ.get('android_client_id'),
-'secret': ('android_client_secret'),
-'key': '',
-}
-}
+    'google': {
+        'APP': {
+            'client_id': os.environ.get('android_client_id'),
+            'secret': ('android_client_secret'),
+            'key': '',
+        }
+    }
 }
 
 # Enregistrement pour l'application iOS

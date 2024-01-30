@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import *
 from django.contrib.auth.views import (
     LoginView, LogoutView,
@@ -8,6 +8,7 @@ from django.contrib.auth.views import (
 
 
 urlpatterns = [
+    path('accounts/', include('allauth.urls')),
     path('login/', login),
     path('register/', UserRegisterView, name='register'),
     path('user/<int:id>/', UserAPIView, name='user'),

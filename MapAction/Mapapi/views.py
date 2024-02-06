@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from .serializer import *
-
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -36,6 +37,9 @@ class CustomPageNumberPagination(PageNumberPagination):
 
 N = 7
 
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({'csrf_token': csrf_token})
 
 @api_view(('GET', 'POST'))
 def login(request):

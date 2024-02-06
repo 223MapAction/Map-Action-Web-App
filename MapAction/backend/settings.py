@@ -49,6 +49,13 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -219,6 +226,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -245,8 +253,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:80",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-
-    
+    "http://139.144.63.233"
 ]
 
 

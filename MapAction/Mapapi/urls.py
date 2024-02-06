@@ -9,6 +9,7 @@ from django.contrib.auth.views import (
 
 urlpatterns = [
     path('accounts/', include('allauth.urls')),
+    path('get_csrf_token/', get_csrf_token, name="get_csrf_token"),
     path('login/', login),
     path('register/', UserRegisterView, name='register'),
     path('user/<int:id>/', UserAPIView, name='user'),
@@ -42,10 +43,10 @@ urlpatterns = [
     path('participate/<int:id>', ParticipateAPIView.as_view(), name='community'),
     path('participate/', ParticipateAPIListView.as_view(), name='community'),
     # URL for views Elu
-    path('community/<int:id>', EluAPIListView.as_view(), name='community'),
-    path('community/', EluToZoneAPIListView.as_view(), name='community'),
+    path('elu/<int:id>', EluAPIListView.as_view(), name='community'),
+    path('elu/', EluToZoneAPIListView.as_view(), name='community'),
     # URL for views citizen
-    path('community/<int:id>', CitizenAPIListView.as_view(), name='community'),
+    path('citizen/<int:id>', CitizenAPIListView.as_view(), name='community'),
     # URL for views zone
     path('zone/<int:id>', ZoneAPIView.as_view(), name='zone'),
     path('zone/', ZoneAPIListView.as_view(), name='zone_list'),

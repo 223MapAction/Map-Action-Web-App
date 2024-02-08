@@ -23,4 +23,4 @@ RUN coverage run manage.py test
 RUN coverage report
 
 # Run Django tests
-CMD ["python", "manage.py", "test"]
+CMD ["python3", "manage.py", "test"]

@@ -22,6 +22,7 @@ from rest_framework.permissions import IsAuthenticated
 from backend.settings import *
 import json
 import datetime
+import requests
 from django.template.loader import get_template, render_to_string
 from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives, send_mail

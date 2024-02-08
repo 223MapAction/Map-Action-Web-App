@@ -361,14 +361,19 @@ class IncidentAPIListView(generics.CreateAPIView):
                     incident_instance.save()
                     
                     
-            if "user_id" in request.data:
-                user = User.objects.get(id=request.data["user_id"])
-                user.points += 1
-                user.save()
-            if "video" in request.data:
-                subprocess.check_call(['python3', settings.BASE_DIR + '/convertvideo.py']) # convert video
+                if "user_id" in request.data:
+                    user = User.objects.get(id=request.data["user_id"])
+                    user.points += 1
+                    user.save()
+                if "video" in request.data:
+                    subprocess.check_call(['python3', settings.BASE_DIR + '/convertvideo.py']) # convert video
 
-            return Response(serializer.data, status=201)
+                return Response(serializer.data, status=201)
+            
+
+            except Exception as e:
+                # Handle any exceptions that may occur during the request
+                return Response({"error": str(e)}, status=500)
         return Response(serializer.errors, status=400)
     """
     cette classe permet de créer et récuperer tous les incidents

@@ -330,6 +330,36 @@ class IncidentAPIListView(generics.CreateAPIView):
             pass
         if serializer.is_valid():
             serializer.save()
+            
+             # Assuming your image field is named 'image' in your Incident model
+            image_name = serializer.data.get('photo')
+
+            # Define the FastAPI endpoint URL
+            fastapi_url = "http://192.168.1.7:8001/api1/image/predict"
+
+            # Prepare the payload with the image name
+            payload = {"image_name": image_name}
+
+            try:
+                # Make a POST request to the FastAPI endpoint
+                response = requests.post(fastapi_url, json=payload)
+
+                # Check if the request was successful (status code 200)
+                if response.status_code == 200:
+                    # Parse the response JSON
+                    result = response.json()
+
+                    # Extract relevant information from the result
+                    prediction = result.get("prediction")
+                    description = result.get("get_context")
+
+                    # Do something with the prediction and description, e.g., save to Incident model
+                    incident_instance = Incident.objects.get(id=serializer.data["id"])
+                    incident_instance.prediction = prediction
+                    incident_instance.description = description
+                    incident_instance.save()
+                    
+                    
             if "user_id" in request.data:
                 user = User.objects.get(id=request.data["user_id"])
                 user.points += 1

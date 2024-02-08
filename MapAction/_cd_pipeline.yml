@@ -47,8 +47,8 @@ services:
       PGADMIN_DEFAULT_EMAIL: root@root.com
       PGADMIN_DEFAULT_PASSWORD: root
     volumes:
-      #- .:/data
-      - ~/pgadmin-data:/var/lib/pgadmin
+      - .:/data
+      #- ~/pgadmin-data:/var/lib/pgadmin
     ports:
       - "5050:80"
     networks:
@@ -67,6 +67,7 @@ services:
     networks:
       micro-services-network:
         ipv4_address: 192.168.0.5
+    restart: on-failure
         
 
 

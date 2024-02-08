@@ -56,6 +56,7 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -91,7 +92,9 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 # ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = "email"
 SOCIALACCOUNT_QUERY_EMAIL = True
+ACCOUNT_EMAIL_REQUIRED = True
 
 
 # Database
@@ -253,7 +256,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:80",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://139.144.63.233"
+    "http://139.144.63.238"
 ]
 
 

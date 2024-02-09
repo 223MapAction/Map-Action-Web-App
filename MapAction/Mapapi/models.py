@@ -143,6 +143,7 @@ class Incident(models.Model):
                              null=True)
     zone = models.CharField(max_length=250, blank=False,
                             null=False)
+    prediction = models.TextField(max_length=250, blank=True, null=True)
     description = models.TextField(max_length=500, blank=True, null=True)
     photo = models.ImageField(upload_to='uploads/',null=True, blank=True)
     video = models.FileField(upload_to='uploads/',blank=True, null=True)

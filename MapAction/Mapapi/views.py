@@ -27,7 +27,9 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives, send_mail
 import random
 import string
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.settings import api_settings
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 
 
 
@@ -42,24 +44,87 @@ N = 7
 def get_csrf_token(request):
     csrf_token = get_token(request)
     return JsonResponse({'csrf_token': csrf_token})
+@extend_schema(
+    description="Endpoint for retrieval token by email",
+    request = UserSerializer,
+    responses = {201: UserSerializer, 400:"Bad request"}
+)
+class GetTokenByMailView(generics.CreateAPIView):
+    permission_classes = (
+    )
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
+    def post(self, request, *args, **kwargs):
+       
+        try:
+            item = User.objects.get(email=request.data['email'])
+        except User.DoesNotExist:
+            return Response(status=404)
+        
+        # Générer le token d'accès
+        token = AccessToken.for_user(item)
+        
+        return Response({
+            "status": "success",
+            "message": "item successfully created",
+            'token': str(token)
+        }, status=status.HTTP_201_CREATED)
 
+@api_view(['POST'])
+@extend_schema(
+    description="Endpoint allowing user login. Authenticates user with provided email and password.",
+    request=None,  
+    responses={200: UserSerializer, 401: "Unauthorized"},
+    parameters=[
+        OpenApiParameter(name='email', description='User email', required=True, type=str),
+        OpenApiParameter(name='password', description='User password', required=True, type=str),
+    ]
+)
 def login_view(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            login(request, user)
-            return JsonResponse({'message': 'Login successful'})
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        user = authenticate(email=email, password=password)
+        if user:
+            refresh = RefreshToken.for_user(user)
+            token = {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }
+            return Response({'user': UserSerializer(user).data, 'token': token}, status=status.HTTP_200_OK)
         else:
-            return JsonResponse({'error': 'Invalid email or password'}, status=400)
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        
 
 @api_view(['GET', 'POST'])
+@extend_schema(
+    description="Endpoint allowing retrieval and creation of users. Retrieves all users from the database and register a new user",
+    request=UserSerializer,
+    responses={201: UserSerializer, 400: "Bad request"},
+    parameters=[
+        OpenApiParameter(name='first_name', description='First name of the user', required=True, type=str),
+        OpenApiParameter(name='last_name', description='Last name of the user', required=True, type=str),
+        OpenApiParameter(name='phone', description='Phone number of the user', required=False, type=str),
+        OpenApiParameter(name='address', description='Address of the user', required=False, type=str),
+        OpenApiParameter(name='email', description='Email of the user', required=True, type=str),
+        OpenApiParameter(name='password', description='Password of the user', required=True, type=str),
+    ],
+    examples=[
+        OpenApiExample(name='User', value={
+            'first_name': 'Annoura',
+            'last_name': 'Toure',
+            'phone': '20303020',
+            'address': 'Mali',
+            'email': 'john@example.com',
+            'password': 'secret_password'
+        })
+    ]
+)
 def UserRegisterView(request):
     if request.method == 'GET':
-        users = User.objects.all().values()
+        users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
@@ -69,7 +134,7 @@ def UserRegisterView(request):
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
-            token ={
+            token = {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token)
             }
@@ -77,11 +142,13 @@ def UserRegisterView(request):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['GET', 'PUT', 'DELETE'])
-def UserAPIView(self, request, id):
-    user = User.objects.all().values()
-
+@extend_schema(
+    description="Endpoint allowing retrieval, updating, and deletion of an user.",
+    request=UserSerializer,
+    responses={200: UserSerializer, 404: "user not found"},  
+)
+def user_api_view(request, id):
     if request.method == 'GET':
         try:
             item = User.objects.get(pk=id)
@@ -94,17 +161,17 @@ def UserAPIView(self, request, id):
         try:
             item = User.objects.get(pk=id)
         except User.DoesNotExist:
-            return Response(status=404)
-        self.data = request.data.copy()
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        data = request.data.copy()
         if "password" in request.data:
             item.set_password(request.data['password'])
-            self.data['password'] = item.password
+            data['password'] = item.password
 
-        serializer = UserPutSerializer(item, data=self.data, partial=True)
+        serializer = UserPutSerializer(item, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'DELETE':
         try:
@@ -114,7 +181,14 @@ def UserAPIView(self, request, id):
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval and creation of users. Retrieves all users from the database, "
+                "sorts them by primary identifier, paginates the results, and serializes them before returning "
+                "the paginated response to the client. For creation, deserializes the request data and saves it "
+                "to the database. Additionally, sends emails to users based on the type of account created.",
+    request=UserSerializer,
+    responses={201: UserSerializer, 400: "Bad request"}, 
+)
 class UserAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -129,7 +203,7 @@ class UserAPIListView(generics.CreateAPIView):
     recovery of all users from the database, sorting them by primary identifier,
     paginates and serializes them and then returns the paginated response to the client.
     """
-
+    
     def get(self, request, format=None):
         items = User.objects.order_by('pk')
         paginator = CustomPageNumberPagination()
@@ -217,7 +291,11 @@ class UserAPIListView(generics.CreateAPIView):
 
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval of incident by zone.",
+    request=IncidentSerializer,
+    responses={200: IncidentSerializer, 404: "Incident not found"},  
+)
 class IncidentByZoneAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -225,7 +303,7 @@ class IncidentByZoneAPIView(generics.CreateAPIView):
     serializer_class = IncidentSerializer
     """
     :param permission class : permissions de qui peut acceder à cette vue. ici n'importe qui peut y accéder et 
-    créer de nouveaux incidents
+     créer de nouveaux incidents
     :param queryset: utilise le queryset incident.objects.all() Cela signifie qu'elle renverra tous les incidents
      de la base de données.
     :param serializer_class: spécifie que cette vue API utilisera la classe IncidentSerializer pour sérialiser et 
@@ -244,7 +322,11 @@ class IncidentByZoneAPIView(generics.CreateAPIView):
         except Incident.DoesNotExist:
             return Response(status=404)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval, updating, and deletion of an incident.",
+    request=IncidentSerializer,
+    responses={200: IncidentSerializer, 404: "Incident not found"},  
+)
 class IncidentAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -268,13 +350,8 @@ class IncidentAPIView(generics.CreateAPIView):
         if serializer.is_valid():
             serializer.save()
             if request.data['etat'] and request.data['etat'] == 'resolved':
-                # subject = "Etat de l'incident sur mapaction"
-                # message = "L'incident du nom de: " +serializer.data['title'] +" que vous avez declaré dans map action a été résolu avec succès "
-                if serializer.data['user_id']:
+                 if serializer.data['user_id']:
                     user = User.objects.get(id=serializer.data['user_id'])
-                    # recepient = user.email
-                    # send_mail(subject,
-                    #     message, EMAIL_HOST_USER, [recepient], fail_silently = False)
                     subject, from_email, to = '[MAP ACTION] - Changement de statut d’incident', settings.EMAIL_HOST_USER, user.email
                     html_content = render_to_string('mail_incident_resolu.html', {
                         'incident': serializer.data['title']})  # render with dynamic value#
@@ -284,9 +361,7 @@ class IncidentAPIView(generics.CreateAPIView):
                     msg.attach_alternative(html_content, "text/html")
                     msg.send()
             if request.data['etat'] and request.data['etat'] == 'in_progress':
-                # subject = "Etat de l'incident sur mapaction"
-                # message = "L'incident du nom de: " +serializer.data['title'] +" que vous avez declaré dans map action est en cours de traitement "
-                if serializer.data['user_id']:
+                  if serializer.data['user_id']:
                     user = User.objects.get(id=serializer.data['user_id'])
                     subject, from_email, to = '[MAP ACTION] - Changement de statut d’incident', settings.EMAIL_HOST_USER, user.email
                     html_content = render_to_string('mail_incident_trait.html', {
@@ -313,7 +388,16 @@ class IncidentAPIView(generics.CreateAPIView):
         ainsi que d'envoyer des emails aux utilisateurs concernés.
     """
 
-
+@extend_schema(
+    description="Endpoint for creating and retrieve a new incident."
+        "Users can submit details of an incident by providing the required information via a POST request."
+        "The submitted data will be validated and stored in the system."
+        "Upon success, a status code 201 (Created) will be returned along with details of the newly created incident."
+        "In case of validation errors or issues with creating the incident, a status code 400 (Bad Request) will be returned along with information about the encountered errors."
+        "Users must ensure that the provided data adheres to the format and constraints defined for incidents in the system.",
+    request=IncidentSerializer,  
+    responses={201: IncidentSerializer, 400: "Bad Request"},  
+)
 class IncidentAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -356,7 +440,11 @@ class IncidentAPIListView(generics.CreateAPIView):
     this class is used to create and retrieve all incidents
     """
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval an incident resolved.",
+    request=IncidentSerializer,
+    responses={200: IncidentSerializer, 404: "Incident not found"},  
+)
 class IncidentResolvedAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -370,7 +458,11 @@ class IncidentResolvedAPIListView(generics.CreateAPIView):
         serializer = IncidentGetSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval an incident not resolved.",
+    request=IncidentSerializer,
+    responses={200: IncidentSerializer, 404: "Incident not found"},  
+)
 class IncidentNotResolvedAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -384,13 +476,17 @@ class IncidentNotResolvedAPIListView(generics.CreateAPIView):
         serializer = IncidentGetSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval, updating, and deletion of an evenement.",
+    request=EvenementSerializer,
+    responses={200: EvenementSerializer, 404: "Incident not found"},  
+)
 class EvenementAPIView(generics.CreateAPIView):
     permission_classes = (
     )
     queryset = Evenement.objects.all()
     serializer_class = EvenementSerializer
-
+    
     def get(self, request, id, format=None):
         try:
             item = Evenement.objects.get(pk=id)
@@ -418,13 +514,18 @@ class EvenementAPIView(generics.CreateAPIView):
         item.delete()
         return Response(status=204)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval and creating of an evenement.",
+    request=EvenementSerializer,
+    responses={201: EvenementSerializer, 400: "Serializer error"},  
+)
 class EvenementAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
     queryset = Evenement.objects.all()
     serializer_class = EvenementSerializer
 
+    
     def get(self, request, format=None):
         items = Evenement.objects.order_by('pk')
         paginator = CustomPageNumberPagination()
@@ -442,13 +543,17 @@ class EvenementAPIListView(generics.CreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval, updating, and deletion of a contact.",
+    request=ContactSerializer,
+    responses={200: ContactSerializer, 404: "Not Found"},  
+)
 class ContactAPIView(generics.CreateAPIView):
     permission_classes = (
     )
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
-
+    
     def get(self, request, id, format=None):
         try:
             item = Contact.objects.get(pk=id)
@@ -476,13 +581,17 @@ class ContactAPIView(generics.CreateAPIView):
         item.delete()
         return Response(status=204)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval and creating of a contact.",
+    request=ContactSerializer,
+    responses={201: ContactSerializer, 400: "Serializer error"},  
+)
 class ContactAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
-
+    
     def get(self, request, format=None):
         items = Contact.objects.order_by('pk')
         paginator = CustomPageNumberPagination()
@@ -506,13 +615,17 @@ class ContactAPIListView(generics.CreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval, updating, and deletion of a community.",
+    request=CommunauteSerializer,
+    responses={200: CommunauteSerializer, 404: "Not Found"},  
+)
 class CommunauteAPIView(generics.CreateAPIView):
     permission_classes = (
     )
     queryset = Communaute.objects.all()
     serializer_class = CommunauteSerializer
-
+    
     def get(self, request, id, format=None):
         try:
             item = Communaute.objects.get(pk=id)
@@ -540,13 +653,17 @@ class CommunauteAPIView(generics.CreateAPIView):
         item.delete()
         return Response(status=204)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval and creating of a community.",
+    request=CommunauteSerializer,
+    responses={201: CommunauteSerializer, 400: "Serializer error"},  
+)
 class CommunauteAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
     queryset = Communaute.objects.all()
     serializer_class = CommunauteSerializer
-
+    
     def get(self, request, format=None):
         items = Communaute.objects.order_by('pk')
         paginator = CustomPageNumberPagination()
@@ -561,11 +678,15 @@ class CommunauteAPIListView(generics.CreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval, updating, and deletion of a rapport.",
+    request=RapportSerializer,
+    responses={200: RapportSerializer, 404: "rapport not found"},  
+)
 class RapportAPIView(generics.CreateAPIView):
     queryset = Rapport.objects.all()
     serializer_class = RapportSerializer
-
+    
     def get(self, request, id, format=None):
         try:
             item = Rapport.objects.get(pk=id)
@@ -619,11 +740,15 @@ class RapportAPIView(generics.CreateAPIView):
         item.delete()
         return Response(status=204)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval and creating of a rapport.",
+    request=RapportSerializer,
+    responses={201: RapportSerializer, 400: "Error"},  
+)
 class RapportAPIListView(generics.CreateAPIView):
     queryset = Rapport.objects.all()
     serializer_class = RapportSerializer
-
+    
     def get(self, request, format=None):
         items = Rapport.objects.order_by('pk')
         paginator = CustomPageNumberPagination()
@@ -648,13 +773,17 @@ class RapportAPIListView(generics.CreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval a rapport by user.",
+    request=RapportSerializer,
+    responses={200: RapportSerializer, 404: "rapport not found"},  
+)
 class RapportByUserAPIView(generics.CreateAPIView):
     permission_classes = (
     )
     queryset = Rapport.objects.all()
     serializer_class = RapportSerializer
-
+    
     def get(self, request, id, format=None, **kwargs):
         try:
             item = Rapport.objects.filter(user_id=id)
@@ -663,11 +792,15 @@ class RapportByUserAPIView(generics.CreateAPIView):
         except Rapport.DoesNotExist:
             return Response(status=404)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval and creating a rapport on zone.",
+    request=RapportSerializer,
+    responses={200: RapportSerializer, 404: "rapport not found"},  
+)
 class RapportOnZoneAPIView(generics.CreateAPIView):
     queryset = Rapport.objects.all()
     serializer_class = RapportSerializer
-
+    
     def get(self, request, format=None):
         items = Rapport.objects.filter(type="zone").order_by('pk')
         paginator = PageNumberPagination()
@@ -708,6 +841,11 @@ class RapportOnZoneAPIView(generics.CreateAPIView):
             return Response(status=404)
 
 
+@extend_schema(
+    description="Endpoint allowing retrieval, updating, and deletion of participation.",
+    request=ParticipateSerializer,
+    responses={200: ParticipateSerializer, 404: "Participation not found"},  
+)
 class ParticipateAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -742,6 +880,11 @@ class ParticipateAPIView(generics.CreateAPIView):
         return Response(status=204)
 
 
+@extend_schema(
+    description="Endpoint allowing retrieval and creating of participation.",
+    request=ParticipateSerializer,
+    responses={201: ParticipateSerializer, 400: "serializer error"},  
+)
 class ParticipateAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -765,7 +908,10 @@ class ParticipateAPIListView(generics.CreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval and creating of an elu.",
+    responses={201: UserEluSerializer, 400: "Serializer error"},  
+)
 class EluAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -808,7 +954,11 @@ class EluAPIListView(generics.CreateAPIView):
             return Response(UserEluSerializer(user).data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing creating of an elu by zone.",
+    request=UserEluSerializer,
+    responses={201: UserEluSerializer, 400: "serializer error"},  
+)
 class EluToZoneAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -826,7 +976,10 @@ class EluToZoneAPIListView(generics.CreateAPIView):
             })
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing retrivial of citizen.",
+    responses={200: UserSerializer, 404: "Citizen not found"},  
+)
 class CitizenAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -840,7 +993,10 @@ class CitizenAPIListView(generics.CreateAPIView):
         serializer = UserSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
-
+@extend_schema(
+    description="Endpoint allowing retrival of user.",
+    responses={200: UserSerializer, 404: "User not found"},  
+)
 class UserRetrieveView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -865,7 +1021,10 @@ class UserRetrieveView(generics.RetrieveAPIView):
             "data": data
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    description="Endpoint allowing retrival, updating and deletion of zone.",
+    responses={200: ZoneSerializer, 404: "zone not found"},  
+)
 class ZoneAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -899,7 +1058,11 @@ class ZoneAPIView(generics.CreateAPIView):
         item.delete()
         return Response(status=204)
 
-
+@extend_schema(
+    description="Endpoint allowing retrival and creating of zone.",
+    request=ZoneSerializer,
+    responses={201: ZoneSerializer, 400: "Bad request"},  
+)
 class ZoneAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -920,7 +1083,10 @@ class ZoneAPIListView(generics.CreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing retrival, updating and deletion of Message.",
+    responses={200: MessageSerializer, 404: "message not found"},  
+)
 class MessageAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -954,13 +1120,16 @@ class MessageAPIView(generics.CreateAPIView):
         item.delete()
         return Response(status=204)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval and creating of message.",
+    responses={201: MessageSerializer, 400: "serializer error"},  
+)
 class MessageAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
-
+    
     def get(self, request, format=None):
         items = Message.objects.order_by('pk')
         paginator = CustomPageNumberPagination()
@@ -986,7 +1155,10 @@ class MessageAPIListView(generics.CreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing retrivial of message by community.",
+    responses={200: MessageSerializer, 404: "message not found"},  
+)
 class MessageByComAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1001,7 +1173,10 @@ class MessageByComAPIView(generics.CreateAPIView):
         except Message.DoesNotExist:
             return Response(status=404)
 
-
+@extend_schema(
+    description="Endpoint allowing retrivial of message by zone.",
+    responses={200: MessageSerializer, 404: "message not found"},  
+)
 class MessageByZoneAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1017,7 +1192,11 @@ class MessageByZoneAPIView(generics.CreateAPIView):
         except Message.DoesNotExist:
             return Response(status=404)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval of incident by month.",
+    request=IncidentSerializer,
+    responses={200: IncidentSerializer, 404: "Incident not found"},  
+)
 class IncidentByMonthAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1048,7 +1227,11 @@ class IncidentByMonthAPIListView(generics.CreateAPIView):
             "data": listData
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval of incident by month on zone.",
+    request=IncidentSerializer,
+    responses={200: IncidentSerializer, 404: "Incident not found"},  
+)
 class IncidentByMonthByZoneAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1080,7 +1263,11 @@ class IncidentByMonthByZoneAPIView(generics.CreateAPIView):
             "data": listData
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval of incident on week.",
+    request=IncidentSerializer,
+    responses={200: IncidentSerializer, 404: "Incident not found"},  
+)
 class IncidentOnWeekAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1111,7 +1298,11 @@ class IncidentOnWeekAPIListView(generics.CreateAPIView):
             "data": listData
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval of incident on week by zone.",
+    request=IncidentSerializer,
+    responses={200: IncidentSerializer, 404: "Incident not found"},  
+)
 class IncidentByWeekByZoneAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1143,7 +1334,11 @@ class IncidentByWeekByZoneAPIView(generics.CreateAPIView):
             "data": listData
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval, updating, and deletion of a category.",
+    request=CategorySerializer,
+    responses={200: CategorySerializer, 404: "category not found"},  
+)
 class CategoryAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1177,7 +1372,11 @@ class CategoryAPIView(generics.CreateAPIView):
         item.delete()
         return Response(status=204)
 
-
+@extend_schema(
+    description="Endpoint allowing retrieval and creating of category.",
+    request=CategorySerializer,
+    responses={201: CategorySerializer, 400: "serializer error"},  
+)
 class CategoryAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1198,7 +1397,10 @@ class CategoryAPIListView(generics.CreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing retrival, updating, and deletion of an indicator",
+    responses={200: IndicateurSerializer, 404: "indicator not found"}
+)
 class IndicateurAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1232,7 +1434,10 @@ class IndicateurAPIView(generics.CreateAPIView):
         item.delete()
         return Response(status=204)
 
-
+@extend_schema(
+    description="Endpoint allowing retrival and creating of indicator",
+    responses={201: IndicateurSerializer, 400: "serializer error"}
+)
 class IndicateurAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1253,7 +1458,10 @@ class IndicateurAPIListView(generics.CreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint allowing changing password",
+    responses={200: ChangePasswordSerializer, 400: "bad request"}
+)
 class ChangePasswordView(generics.UpdateAPIView):
     """
     An endpoint for changing password.
@@ -1289,7 +1497,10 @@ class ChangePasswordView(generics.UpdateAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+@extend_schema(
+    description="Endpoint for updating points of users based on their activities.",
+    responses={200: "Points updated successfully."},
+)
 class UpdatePointAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1310,7 +1521,10 @@ class UpdatePointAPIListView(generics.CreateAPIView):
             "message": "update success ",
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    description="Endpoint for retrieving statistics on incidents based on indicators.",
+    responses={200: "Statistics on incidents retrieved successfully."},
+)
 class IndicateurOnIncidentAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1337,7 +1551,10 @@ class IndicateurOnIncidentAPIListView(generics.CreateAPIView):
             "data": listData
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    description="Endpoint for retrieving statistics on incidents based on indicators by zone.",
+    responses={200: "Statistics on incidents retrieved successfully."},
+)
 class IndicateurOnIncidentByZoneAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1365,7 +1582,10 @@ class IndicateurOnIncidentByZoneAPIView(generics.CreateAPIView):
             "data": listData
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    description="Endpoint for retrieving statistics on incidents based on indicators for a elu (organisation) user.",
+    responses={200: "Statistics on incidents for the user retrieved successfully."},
+)
 class IndicateurOnIncidentByEluAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1461,7 +1681,11 @@ class PasswordResetView(generics.CreateAPIView):
             "message": "item successfully saved",
         }, status=status.HTTP_201_CREATED)
 
-
+@extend_schema(
+    description="Endpoint for resetting user password.",
+    request=ResetPasswordSerializer,
+    responses={400: "Bad Request"},
+)
 class PasswordResetRequestView(generics.CreateAPIView):
     """ use postman to test give field email post methode"""
     permission_classes = (
@@ -1515,7 +1739,11 @@ class PasswordResetRequestView(generics.CreateAPIView):
             "message": "item successfully saved ",
         }, status=status.HTTP_201_CREATED)
 
-
+@extend_schema(
+    description="Endpoint for managing response messages.",
+    request=ResponseMessageSerializer,
+    responses={201: ResponseMessageSerializer, 400: "Bad Request"},
+)
 class ResponseMessageAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1549,7 +1777,11 @@ class ResponseMessageAPIView(generics.CreateAPIView):
         item.delete()
         return Response(status=204)
 
-
+@extend_schema(
+    description="Endpoint for managing response messages.",
+    request=ResponseMessageSerializer,
+    responses={201: ResponseMessageSerializer, 400: "Bad Request"},
+)
 class ResponseMessageAPIListView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1570,7 +1802,10 @@ class ResponseMessageAPIListView(generics.CreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+@extend_schema(
+    description="Endpoint for retrieving responses by message ID.",
+    responses={200: ResponseMessageSerializer(many=True), 404: "Not Found"},
+)
 class ResponseByMessageAPIView(generics.CreateAPIView):
     permission_classes = (
     )
@@ -1585,7 +1820,10 @@ class ResponseByMessageAPIView(generics.CreateAPIView):
         except ResponseMessage.DoesNotExist:
             return Response(status=404)
 
-
+@extend_schema(
+    description="Endpoint for retrieving messages by user ID.",
+    responses={200: MessageGetSerializer(many=True), 404: "Not Found"},
+)
 class MessageByUserAPIView(generics.CreateAPIView):
     permission_classes = (
     )

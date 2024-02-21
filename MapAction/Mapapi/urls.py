@@ -5,20 +5,35 @@ from django.contrib.auth.views import (
     PasswordChangeView, PasswordChangeDoneView,
     PasswordResetView,PasswordResetDoneView, PasswordResetConfirmView,PasswordResetCompleteView,
 )
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
 urlpatterns = [
+    # URL PATTERNS for the documentation
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('accounts/', include('allauth.urls')),
+    # for token
+    path('login/', TokenObtainPairView.as_view(), name='login'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('get_csrf_token/', get_csrf_token, name="get_csrf_token"),
-    path('login/', login),
+    path("gettoken_bymail/", GetTokenByMailView.as_view(), name="get_token_by_mail"),
+    # path('login/', login),
     path('register/', UserRegisterView, name='register'),
-    path('user/<int:id>/', UserAPIView, name='user'),
+    path('user/<int:id>/', user_api_view, name='user'),
     path('user/', UserAPIListView.as_view(), name='user_list'),
     path('user_retrieve/', UserRetrieveView.as_view(), name='user_retrieve'),
     # URL for views incidents
     path('incidentByZone/<int:zone>/', IncidentByZoneAPIView.as_view(), name='incidentZone'),
-    path('incident/<int:id>', IncidentAPIView.as_view(), name='incidentZone'),
-    path('incident/', IncidentAPIListView.as_view(), name='incidentZone'),
+    path('incident/<int:id>', IncidentAPIView.as_view(), name='incident_rud'),
+    path('incident/', IncidentAPIListView.as_view(), name='incident'),
     path('incidentResolved/', IncidentResolvedAPIListView.as_view(), name='incidentResolved'),
     path('incidentNotResolved/', IncidentNotResolvedAPIListView.as_view(), name='incidentNotResolved'),
     path('incidentByMonth/', IncidentByMonthAPIListView.as_view(), name='incidentByMonth'),

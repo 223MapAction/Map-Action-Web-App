@@ -43,7 +43,7 @@ class UserEluSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = (
-            'user_permissions', 'groups', 'is_superuser', 'is_active', 'is_staff', 'password')
+            'user_permissions', 'is_superuser', 'is_active', 'is_staff', 'password')
 
     def create(self, validated_data, **extra_fields):
         user = self.Meta.model(**validated_data)

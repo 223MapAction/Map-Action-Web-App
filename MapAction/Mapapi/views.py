@@ -28,8 +28,6 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives, send_mail
 import random
 import string
-from rest_framework_simplejwt.tokens import RefreshToken
-
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -44,18 +42,13 @@ def get_csrf_token(request):
     csrf_token = get_token(request)
     return JsonResponse({'csrf_token': csrf_token})
 
-def login_view(request):
+@api_view(('GET', 'POST'))
+def login(request):
+    if request.method == 'GET':
+        return Response('i am a test', status=status.HTTP_200_OK)
     if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            login(request, user)
-            return JsonResponse({'message': 'Login successful'})
-        else:
-            return JsonResponse({'error': 'Invalid email or password'}, status=400)
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
+        return Response("i am a test too", status=status.HTTP_200_OK)
+
 
 @api_view(['GET', 'POST'])
 def UserRegisterView(request):
@@ -68,13 +61,8 @@ def UserRegisterView(request):
         serializer = UserRegisterSerializer(data=request.data)
 
         if serializer.is_valid():
-            user = serializer.save()
-            refresh = RefreshToken.for_user(user)
-            token ={
-                'refresh': str(refresh),
-                'access': str(refresh.access_token)
-            }
-            return Response({'user': serializer.data, 'token': token}, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

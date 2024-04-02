@@ -29,6 +29,11 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives, send_mail
 import random
 import string
+<<<<<<< HEAD
+import httpx
+from celery.result import AsyncResult
+from .tasks import prediction_task
+=======
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.settings import api_settings
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
@@ -38,6 +43,7 @@ import pyotp
 import os
 from twilio.rest import Client
 
+>>>>>>> df16489ae8bf232da88b6fc76a0e4cdad9fdbe57
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -406,11 +412,11 @@ class IncidentAPIView(generics.CreateAPIView):
     responses={201: IncidentSerializer, 400: "Bad Request"},  
 )
 class IncidentAPIListView(generics.CreateAPIView):
-    permission_classes = (
-    )
+    permission_classes = ()
+    
     queryset = Incident.objects.all()
     serializer_class = IncidentSerializer
-
+    
     def get(self, request, format=None):
         items = Incident.objects.order_by('-pk')
         paginator = CustomPageNumberPagination()
@@ -431,51 +437,44 @@ class IncidentAPIListView(generics.CreateAPIView):
             zone.save()
         except IntegrityError:
             pass
+
         if serializer.is_valid():
             serializer.save()
+
+            image_name = serializer.data.get("photo")
+            print("Image Name:", image_name)
+
+            longitude = serializer.data.get("longitude")
+            print("Longitude:", longitude)
+
+            result = prediction_task.delay(image_name, longitude)
             
-             # Assuming your image field is named 'image' in your Incident model
-            image_name = serializer.data.get('photo')
-
-            # Define the FastAPI endpoint URL
-            fastapi_url = "http://192.168.1.7:8001/api1/image/predict"
-
-            # Prepare the payload with the image name
-            payload = {"image_name": image_name}
-
+            #result_value = result.get()
+            
+            if result_value:
+                prediction, description, longitude = result_value
+            
             try:
-                # Make a POST request to the FastAPI endpoint
-                response = requests.post(fastapi_url, json=payload)
+                incident_instance = Incident.objects.get(longitude=longitude)
+                incident_instance.prediction = prediction
+                incident_instance.description = description
+                incident_instance.save()
+                print("Incident updated successfully.")
+            except Incident.DoesNotExist:
+                print(f"No incident found with longitude={longitude}")
 
-                # Check if the request was successful (status code 200)
-                if response.status_code == 200:
-                    # Parse the response JSON
-                    result = response.json()
+          
 
-                    # Extract relevant information from the result
-                    prediction = result.get("prediction")
-                    description = result.get("get_context")
+            if "user_id" in request.data:
+                user = User.objects.get(id=request.data["user_id"])
+                user.points += 1
+                user.save()
 
-                    # Do something with the prediction and description, e.g., save to Incident model
-                    incident_instance = Incident.objects.get(id=serializer.data["id"])
-                    incident_instance.prediction = prediction
-                    incident_instance.description = description
-                    incident_instance.save()
-                    
-                    
-                if "user_id" in request.data:
-                    user = User.objects.get(id=request.data["user_id"])
-                    user.points += 1
-                    user.save()
-                if "video" in request.data:
-                    subprocess.check_call(['python3', settings.BASE_DIR + '/convertvideo.py']) # convert video
+            if "video" in request.data:
+                subprocess.check_call(['python', f"{settings.BASE_DIR}" + '/convertvideo.py'])
 
-                return Response(serializer.data, status=201)
-            
+            return Response(serializer.data, status=201)
 
-            except Exception as e:
-                # Handle any exceptions that may occur during the request
-                return Response({"error": str(e)}, status=500)
         return Response(serializer.errors, status=400)
     """
     cette classe permet de créer et récuperer tous les incidents

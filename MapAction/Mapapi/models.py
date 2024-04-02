@@ -322,4 +322,10 @@ class ImageBackground(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+# verification code otp
+class PhoneOTP(models.Model):
+    phone_number = models.CharField(max_length=15)
+    otp_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 

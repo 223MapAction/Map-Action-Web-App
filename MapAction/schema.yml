@@ -1,0 +1,3383 @@
+openapi: 3.0.3
+info:
+  title: Map Action API
+  version: 1.0.0
+  description: This is the documentation of Map Action Api
+paths:
+  /MapApi/Event/:
+    get:
+      operationId: Event_retrieve
+      tags:
+      - Event
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+          description: ''
+    post:
+      operationId: Event_create
+      tags:
+      - Event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evenement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Evenement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Evenement'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+          description: ''
+  /MapApi/Event/{id}:
+    get:
+      operationId: Event_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Event
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+          description: ''
+    post:
+      operationId: Event_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evenement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Evenement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Evenement'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+          description: ''
+    put:
+      operationId: Event_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evenement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Evenement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Evenement'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+          description: ''
+    delete:
+      operationId: Event_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Event
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /MapApi/IncidentOnWeek/:
+    get:
+      operationId: IncidentOnWeek_retrieve
+      tags:
+      - IncidentOnWeek
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: IncidentOnWeek_create
+      tags:
+      - IncidentOnWeek
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/IncidentOnWeek_zone/{zone}:
+    get:
+      operationId: IncidentOnWeek_zone_retrieve
+      parameters:
+      - in: path
+        name: zone
+        schema:
+          type: string
+        required: true
+      tags:
+      - IncidentOnWeek_zone
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: IncidentOnWeek_zone_create
+      parameters:
+      - in: path
+        name: zone
+        schema:
+          type: string
+        required: true
+      tags:
+      - IncidentOnWeek_zone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/category/:
+    get:
+      operationId: category_retrieve
+      tags:
+      - category
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    post:
+      operationId: category_create
+      tags:
+      - category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Category'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /MapApi/category/{id}:
+    get:
+      operationId: category_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - category
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    post:
+      operationId: category_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Category'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    put:
+      operationId: category_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Category'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    delete:
+      operationId: category_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - category
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /MapApi/change_password/:
+    put:
+      operationId: change_password_update
+      description: An endpoint for changing password.
+      tags:
+      - change_password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePassword'
+          description: ''
+    patch:
+      operationId: change_password_partial_update
+      description: An endpoint for changing password.
+      tags:
+      - change_password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChangePassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChangePassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChangePassword'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePassword'
+          description: ''
+  /MapApi/citizen/{id}:
+    get:
+      operationId: citizen_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - citizen
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    post:
+      operationId: citizen_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - citizen
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /MapApi/community/:
+    get:
+      operationId: community_retrieve
+      tags:
+      - community
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Communaute'
+          description: ''
+    post:
+      operationId: community_create
+      tags:
+      - community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Communaute'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Communaute'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Communaute'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Communaute'
+          description: ''
+  /MapApi/community/{id}:
+    get:
+      operationId: community_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - community
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Communaute'
+          description: ''
+    post:
+      operationId: community_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Communaute'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Communaute'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Communaute'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Communaute'
+          description: ''
+    put:
+      operationId: community_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Communaute'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Communaute'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Communaute'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Communaute'
+          description: ''
+    delete:
+      operationId: community_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - community
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /MapApi/contact/:
+    get:
+      operationId: contact_retrieve
+      tags:
+      - contact
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+    post:
+      operationId: contact_create
+      tags:
+      - contact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Contact'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+  /MapApi/contact/{id}:
+    get:
+      operationId: contact_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - contact
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+    post:
+      operationId: contact_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - contact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Contact'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+    put:
+      operationId: contact_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - contact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Contact'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+    delete:
+      operationId: contact_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - contact
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /MapApi/elu/:
+    post:
+      operationId: elu_create
+      tags:
+      - elu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EluToZone'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EluToZone'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EluToZone'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EluToZone'
+          description: ''
+  /MapApi/elu/{id}:
+    get:
+      operationId: elu_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - elu
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserElu'
+          description: ''
+    post:
+      operationId: elu_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - elu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserElu'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserElu'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserElu'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserElu'
+          description: ''
+  /MapApi/gettoken_bymail/:
+    post:
+      operationId: gettoken_bymail_create
+      tags:
+      - gettoken_bymail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /MapApi/image/:
+    get:
+      operationId: image_retrieve
+      tags:
+      - image
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageBackground'
+          description: ''
+    post:
+      operationId: image_create
+      tags:
+      - image
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageBackground'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ImageBackground'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImageBackground'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageBackground'
+          description: ''
+  /MapApi/image/{id}:
+    get:
+      operationId: image_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - image
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageBackground'
+          description: ''
+    post:
+      operationId: image_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - image
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageBackground'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ImageBackground'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImageBackground'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageBackground'
+          description: ''
+    put:
+      operationId: image_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - image
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageBackground'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ImageBackground'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImageBackground'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageBackground'
+          description: ''
+    delete:
+      operationId: image_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - image
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /MapApi/incident/:
+    get:
+      operationId: incident_retrieve
+      tags:
+      - incident
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: incident_create
+      tags:
+      - incident
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/incident/{id}:
+    get:
+      operationId: incident_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - incident
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: incident_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - incident
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    put:
+      operationId: incident_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - incident
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    delete:
+      operationId: incident_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - incident
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /MapApi/incidentByMonth/:
+    get:
+      operationId: incidentByMonth_retrieve
+      tags:
+      - incidentByMonth
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: incidentByMonth_create
+      tags:
+      - incidentByMonth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/incidentByMonth_zone/{zone}:
+    get:
+      operationId: incidentByMonth_zone_retrieve
+      parameters:
+      - in: path
+        name: zone
+        schema:
+          type: string
+        required: true
+      tags:
+      - incidentByMonth_zone
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: incidentByMonth_zone_create
+      parameters:
+      - in: path
+        name: zone
+        schema:
+          type: string
+        required: true
+      tags:
+      - incidentByMonth_zone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/incidentByZone/{zone}/:
+    get:
+      operationId: incidentByZone_retrieve
+      parameters:
+      - in: path
+        name: zone
+        schema:
+          type: integer
+        required: true
+      tags:
+      - incidentByZone
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: incidentByZone_create
+      parameters:
+      - in: path
+        name: zone
+        schema:
+          type: integer
+        required: true
+      tags:
+      - incidentByZone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/incidentNotResolved/:
+    get:
+      operationId: incidentNotResolved_retrieve
+      tags:
+      - incidentNotResolved
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: incidentNotResolved_create
+      tags:
+      - incidentNotResolved
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/incidentResolved/:
+    get:
+      operationId: incidentResolved_retrieve
+      tags:
+      - incidentResolved
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: incidentResolved_create
+      tags:
+      - incidentResolved
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/indicator/:
+    get:
+      operationId: indicator_retrieve
+      tags:
+      - indicator
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indicateur'
+          description: ''
+    post:
+      operationId: indicator_create
+      tags:
+      - indicator
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Indicateur'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Indicateur'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Indicateur'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indicateur'
+          description: ''
+  /MapApi/indicator/{id}:
+    get:
+      operationId: indicator_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - indicator
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indicateur'
+          description: ''
+    post:
+      operationId: indicator_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - indicator
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Indicateur'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Indicateur'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Indicateur'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indicateur'
+          description: ''
+    put:
+      operationId: indicator_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - indicator
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Indicateur'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Indicateur'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Indicateur'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indicateur'
+          description: ''
+    delete:
+      operationId: indicator_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - indicator
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /MapApi/indicator_incident/:
+    get:
+      operationId: indicator_incident_retrieve
+      tags:
+      - indicator_incident
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: indicator_incident_create
+      tags:
+      - indicator_incident
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/indicator_incident_elu/{id}:
+    get:
+      operationId: indicator_incident_elu_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - indicator_incident_elu
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: indicator_incident_elu_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - indicator_incident_elu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/indicator_incident_zone/{zone}:
+    get:
+      operationId: indicator_incident_zone_retrieve
+      parameters:
+      - in: path
+        name: zone
+        schema:
+          type: string
+        required: true
+      tags:
+      - indicator_incident_zone
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    post:
+      operationId: indicator_incident_zone_create
+      parameters:
+      - in: path
+        name: zone
+        schema:
+          type: string
+        required: true
+      tags:
+      - indicator_incident_zone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Incident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Incident'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /MapApi/message/:
+    get:
+      operationId: message_retrieve
+      tags:
+      - message
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    post:
+      operationId: message_create
+      tags:
+      - message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Message'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /MapApi/message/{id}:
+    get:
+      operationId: message_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - message
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    post:
+      operationId: message_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Message'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    put:
+      operationId: message_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Message'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    delete:
+      operationId: message_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - message
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /MapApi/message/{zone}:
+    get:
+      operationId: message_retrieve_3
+      parameters:
+      - in: path
+        name: zone
+        schema:
+          type: integer
+        required: true
+      tags:
+      - message
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    post:
+      operationId: message_create_3
+      parameters:
+      - in: path
+        name: zone
+        schema:
+          type: integer
+        required: true
+      tags:
+      - message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Message'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /MapApi/message_user/:
+    get:
+      operationId: message_user_retrieve
+      tags:
+      - message_user
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    post:
+      operationId: message_user_create
+      tags:
+      - message_user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Message'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /MapApi/participate/:
+    get:
+      operationId: participate_retrieve
+      tags:
+      - participate
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participate'
+          description: ''
+    post:
+      operationId: participate_create
+      tags:
+      - participate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Participate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Participate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Participate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participate'
+          description: ''
+  /MapApi/participate/{id}:
+    get:
+      operationId: participate_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - participate
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participate'
+          description: ''
+    post:
+      operationId: participate_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - participate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Participate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Participate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Participate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participate'
+          description: ''
+    put:
+      operationId: participate_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - participate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Participate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Participate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Participate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participate'
+          description: ''
+    delete:
+      operationId: participate_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - participate
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /MapApi/password/:
+    post:
+      operationId: password_create
+      description: use postman to test give field email post methode
+      tags:
+      - password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RequestPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RequestPassword'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestPassword'
+          description: ''
+  /MapApi/rapport/:
+    get:
+      operationId: rapport_retrieve
+      tags:
+      - rapport
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rapport'
+          description: ''
+    post:
+      operationId: rapport_create
+      tags:
+      - rapport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rapport'
+          description: ''
+  /MapApi/rapport/{id}:
+    get:
+      operationId: rapport_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rapport
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rapport'
+          description: ''
+    post:
+      operationId: rapport_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rapport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rapport'
+          description: ''
+    put:
+      operationId: rapport_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rapport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rapport'
+          description: ''
+    delete:
+      operationId: rapport_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rapport
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /MapApi/rapport_user/{id}:
+    get:
+      operationId: rapport_user_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rapport_user
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rapport'
+          description: ''
+    post:
+      operationId: rapport_user_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rapport_user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rapport'
+          description: ''
+  /MapApi/rapport_zone/:
+    get:
+      operationId: rapport_zone_retrieve
+      tags:
+      - rapport_zone
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rapport'
+          description: ''
+    post:
+      operationId: rapport_zone_create
+      tags:
+      - rapport_zone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rapport'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rapport'
+          description: ''
+  /MapApi/register/:
+    get:
+      operationId: register_retrieve
+      tags:
+      - register
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: register_create
+      tags:
+      - register
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /MapApi/response_msg/:
+    get:
+      operationId: response_msg_retrieve
+      tags:
+      - response_msg
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseMessage'
+          description: ''
+    post:
+      operationId: response_msg_create
+      tags:
+      - response_msg
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResponseMessage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResponseMessage'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseMessage'
+          description: ''
+  /MapApi/response_msg/{id}:
+    get:
+      operationId: response_msg_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - response_msg
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseMessage'
+          description: ''
+    post:
+      operationId: response_msg_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - response_msg
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResponseMessage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResponseMessage'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseMessage'
+          description: ''
+    put:
+      operationId: response_msg_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - response_msg
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResponseMessage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResponseMessage'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseMessage'
+          description: ''
+    delete:
+      operationId: response_msg_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - response_msg
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /MapApi/updatePoint/:
+    get:
+      operationId: updatePoint_retrieve
+      tags:
+      - updatePoint
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    post:
+      operationId: updatePoint_create
+      tags:
+      - updatePoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /MapApi/user/:
+    get:
+      operationId: user_retrieve
+      tags:
+      - user
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    post:
+      operationId: user_create
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /MapApi/user/{id}/:
+    get:
+      operationId: user_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - user
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: user_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - user
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: user_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - user
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /MapApi/user_retrieve/:
+    get:
+      operationId: user_retrieve_retrieve
+      tags:
+      - user_retrieve
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /MapApi/zone/:
+    get:
+      operationId: zone_retrieve
+      tags:
+      - zone
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Zone'
+          description: ''
+    post:
+      operationId: zone_create
+      tags:
+      - zone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Zone'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Zone'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Zone'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Zone'
+          description: ''
+  /MapApi/zone/{id}:
+    get:
+      operationId: zone_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - zone
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Zone'
+          description: ''
+    post:
+      operationId: zone_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - zone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Zone'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Zone'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Zone'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Zone'
+          description: ''
+    put:
+      operationId: zone_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - zone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Zone'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Zone'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Zone'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Zone'
+          description: ''
+    delete:
+      operationId: zone_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - zone
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 250
+        photo:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+    ChangePassword:
+      type: object
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+      required:
+      - new_password
+      - old_password
+    Communaute:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 250
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        zone:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - name
+    Contact:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        objet:
+          type: string
+          maxLength: 250
+        message:
+          type: string
+          nullable: true
+          maxLength: 500
+        email:
+          type: string
+          nullable: true
+          maxLength: 250
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - objet
+    EluToZone:
+      type: object
+      properties:
+        zone:
+          type: integer
+        elu:
+          type: integer
+      required:
+      - elu
+      - zone
+    EtatEnum:
+      enum:
+      - declared
+      - resolved
+      - in_progress
+      - taken_into_account
+      type: string
+      description: |-
+        * `declared` - declared
+        * `resolved` - resolved
+        * `in_progress` - in_progress
+        * `taken_into_account` - taken_into_account
+    Evenement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          nullable: true
+          maxLength: 255
+        zone:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 500
+        photo:
+          type: string
+          format: uri
+          nullable: true
+        date:
+          type: string
+          format: date-time
+          nullable: true
+        lieu:
+          type: string
+          maxLength: 250
+        video:
+          type: string
+          format: uri
+          nullable: true
+        audio:
+          type: string
+          format: uri
+          nullable: true
+        latitude:
+          type: string
+          nullable: true
+          maxLength: 1000
+        longitude:
+          type: string
+          nullable: true
+          maxLength: 1000
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - lieu
+      - zone
+    ImageBackground:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        photo:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+    Incident:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          nullable: true
+          maxLength: 250
+        zone:
+          type: string
+          maxLength: 250
+        description:
+          type: string
+          nullable: true
+          maxLength: 500
+        photo:
+          type: string
+          format: uri
+          nullable: true
+        video:
+          type: string
+          format: uri
+          nullable: true
+        audio:
+          type: string
+          format: uri
+          nullable: true
+        lattitude:
+          type: string
+          nullable: true
+          maxLength: 250
+        longitude:
+          type: string
+          nullable: true
+          maxLength: 250
+        etat:
+          $ref: '#/components/schemas/EtatEnum'
+        slug:
+          type: string
+          nullable: true
+          maxLength: 250
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: integer
+          nullable: true
+        category_id:
+          type: integer
+          nullable: true
+        indicateur_id:
+          type: integer
+          nullable: true
+        category_ids:
+          type: array
+          items:
+            type: integer
+      required:
+      - created_at
+      - id
+      - zone
+    Indicateur:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 250
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        objet:
+          type: string
+          maxLength: 250
+        message:
+          type: string
+          maxLength: 250
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        zone:
+          type: integer
+          nullable: true
+        communaute:
+          type: integer
+          nullable: true
+        user_id:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - message
+      - objet
+    Participate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        evenement_id:
+          type: integer
+          nullable: true
+        user_id:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+    PatchedChangePassword:
+      type: object
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+    Rapport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        details:
+          type: string
+          maxLength: 500
+        type:
+          type: string
+          nullable: true
+          maxLength: 500
+        zone:
+          type: string
+          nullable: true
+          maxLength: 250
+        date_livraison:
+          type: string
+          nullable: true
+          maxLength: 100
+        statut:
+          $ref: '#/components/schemas/StatutEnum'
+        disponible:
+          type: boolean
+          title: Active
+        file:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        incident:
+          type: integer
+          nullable: true
+        user_id:
+          type: integer
+          nullable: true
+        incidents:
+          type: array
+          items:
+            type: integer
+      required:
+      - created_at
+      - details
+      - id
+    RequestPassword:
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+      - email
+    ResponseMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        response:
+          type: string
+          maxLength: 250
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        message:
+          type: integer
+          nullable: true
+        elu:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - response
+    StatutEnum:
+      enum:
+      - new
+      - in_progress
+      - edit
+      - canceled
+      type: string
+      description: |-
+        * `new` - new
+        * `in_progress` - in_progress
+        * `edit` - edit
+        * `canceled` - canceled
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          maxLength: 128
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 255
+        last_name:
+          type: string
+          maxLength: 255
+        phone:
+          type: string
+          nullable: true
+          title: Phone number
+          maxLength: 20
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        password_reset_count:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,0})?$
+          nullable: true
+        address:
+          type: string
+          nullable: true
+          title: Adress
+          maxLength: 255
+        user_type:
+          $ref: '#/components/schemas/UserTypeEnum'
+        provider:
+          type: string
+          nullable: true
+          maxLength: 255
+        organisation:
+          type: string
+          nullable: true
+          maxLength: 255
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        community:
+          type: integer
+          nullable: true
+        zones:
+          type: array
+          items:
+            type: integer
+      required:
+      - date_joined
+      - email
+      - first_name
+      - id
+      - last_name
+      - password
+    UserElu:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 255
+        last_name:
+          type: string
+          maxLength: 255
+        phone:
+          type: string
+          nullable: true
+          title: Phone number
+          maxLength: 20
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        password_reset_count:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,0})?$
+          nullable: true
+        address:
+          type: string
+          nullable: true
+          title: Adress
+          maxLength: 255
+        user_type:
+          $ref: '#/components/schemas/UserTypeEnum'
+        provider:
+          type: string
+          nullable: true
+          maxLength: 255
+        organisation:
+          type: string
+          nullable: true
+          maxLength: 255
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        community:
+          type: integer
+          nullable: true
+        zones:
+          type: array
+          items:
+            type: integer
+      required:
+      - date_joined
+      - email
+      - first_name
+      - id
+      - last_name
+    UserTypeEnum:
+      enum:
+      - admin
+      - visitor
+      - reporter
+      - citizen
+      - business
+      - elu
+      type: string
+      description: |-
+        * `admin` - admin
+        * `visitor` - visitor
+        * `reporter` - reporter
+        * `citizen` - citizen
+        * `business` - business
+        * `elu` - elu
+    Zone:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 250
+        lattitude:
+          type: string
+          nullable: true
+          maxLength: 250
+        longitude:
+          type: string
+          nullable: true
+          maxLength: 250
+        photo:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

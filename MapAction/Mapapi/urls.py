@@ -8,6 +8,7 @@ from django.contrib.auth.views import (
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
+    TokenVerifyView,
 )
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -22,6 +23,7 @@ urlpatterns = [
     # for token
     path('login/', TokenObtainPairView.as_view(), name='login'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('verify-token/', TokenVerifyView.as_view(), name='token_verify'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('get_csrf_token/', get_csrf_token, name="get_csrf_token"),
     path("gettoken_bymail/", GetTokenByMailView.as_view(), name="get_token_by_mail"),
@@ -37,6 +39,7 @@ urlpatterns = [
     path('incidentResolved/', IncidentResolvedAPIListView.as_view(), name='incidentResolved'),
     path('incidentNotResolved/', IncidentNotResolvedAPIListView.as_view(), name='incidentNotResolved'),
     path('incidentByMonth/', IncidentByMonthAPIListView.as_view(), name='incidentByMonth'),
+    # path('incidentByMonths/', IncidentByMonthAPIList.as_view(), name='incidentByMonth'),
     path('incidentByMonth_zone/<zone>', IncidentByMonthByZoneAPIView.as_view(), name='incidentByMonth_zone'),
     path('IncidentOnWeek/', IncidentOnWeekAPIListView.as_view(), name='IncidentOnWeek'),
     path('IncidentOnWeek_zone/<zone>', IncidentByWeekByZoneAPIView.as_view(), name='IncidentOnWeek_zone'),
@@ -55,13 +58,13 @@ urlpatterns = [
     path('rapport_user/<int:id>', RapportByUserAPIView.as_view(), name='rapport_user'),
     path('rapport_zone/', RapportOnZoneAPIView.as_view(), name='rapport_zone'),
     # URL for views participate
-    path('participate/<int:id>', ParticipateAPIView.as_view(), name='community'),
-    path('participate/', ParticipateAPIListView.as_view(), name='community'),
+    path('participate/<int:id>', ParticipateAPIView.as_view(), name='participate_rud'),
+    path('participate/', ParticipateAPIListView.as_view(), name='participate'),
     # URL for views Elu
-    path('elu/<int:id>', EluAPIListView.as_view(), name='community'),
-    path('elu/', EluToZoneAPIListView.as_view(), name='community'),
+    path('elu/<int:id>', EluAPIListView.as_view(), name='elu_rud'),
+    path('elu/', EluToZoneAPIListView.as_view(), name='elu_zone'),
     # URL for views citizen
-    path('citizen/<int:id>', CitizenAPIListView.as_view(), name='community'),
+    path('citizen/', CitizenAPIListView.as_view(), name='citizen'),
     # URL for views zone
     path('zone/<int:id>', ZoneAPIView.as_view(), name='zone'),
     path('zone/', ZoneAPIListView.as_view(), name='zone_list'),
@@ -90,4 +93,8 @@ urlpatterns = [
     path('password_reset/', PasswordResetView.as_view(), name='passwordReset'),
     path('change_password/', ChangePasswordView.as_view(), name='change_password'),
     path('updatePoint/', UpdatePointAPIListView.as_view(), name='updatePoint'),
+    # Overpass URL
+    path('overpass/', OverpassApiIntegration.as_view(), name="overpassapi"),
+    # OTP URL
+    path('verify_otp/', PhoneOTPView.as_view(), name="verify_otp"),
 ]

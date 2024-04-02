@@ -1,6 +1,7 @@
 import subprocess
 
 from django.shortcuts import render, HttpResponse
+from django.core.serializers import serialize
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -22,6 +23,7 @@ from rest_framework.permissions import IsAuthenticated
 from backend.settings import *
 import json
 import datetime
+import requests
 from django.template.loader import get_template, render_to_string
 from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives, send_mail
@@ -30,6 +32,11 @@ import string
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.settings import api_settings
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+import overpy
+from rest_framework.exceptions import NotFound, ValidationError
+import pyotp
+import os
+from twilio.rest import Client
 
 
 
@@ -426,14 +433,49 @@ class IncidentAPIListView(generics.CreateAPIView):
             pass
         if serializer.is_valid():
             serializer.save()
-            if "user_id" in request.data:
-                user = User.objects.get(id=request.data["user_id"])
-                user.points += 1
-                user.save()
-            if "video" in request.data:
-                subprocess.check_call(['python3', settings.BASE_DIR + '/convertvideo.py']) # convert video
+            
+             # Assuming your image field is named 'image' in your Incident model
+            image_name = serializer.data.get('photo')
 
-            return Response(serializer.data, status=201)
+            # Define the FastAPI endpoint URL
+            fastapi_url = "http://192.168.1.7:8001/api1/image/predict"
+
+            # Prepare the payload with the image name
+            payload = {"image_name": image_name}
+
+            try:
+                # Make a POST request to the FastAPI endpoint
+                response = requests.post(fastapi_url, json=payload)
+
+                # Check if the request was successful (status code 200)
+                if response.status_code == 200:
+                    # Parse the response JSON
+                    result = response.json()
+
+                    # Extract relevant information from the result
+                    prediction = result.get("prediction")
+                    description = result.get("get_context")
+
+                    # Do something with the prediction and description, e.g., save to Incident model
+                    incident_instance = Incident.objects.get(id=serializer.data["id"])
+                    incident_instance.prediction = prediction
+                    incident_instance.description = description
+                    incident_instance.save()
+                    
+                    
+                if "user_id" in request.data:
+                    user = User.objects.get(id=request.data["user_id"])
+                    user.points += 1
+                    user.save()
+                if "video" in request.data:
+                    subprocess.check_call(['python3', settings.BASE_DIR + '/convertvideo.py']) # convert video
+
+                return Response(serializer.data, status=201)
+            
+
+            except Exception as e:
+                # Handle any exceptions that may occur during the request
+                return Response({"error": str(e)}, status=500)
         return Response(serializer.errors, status=400)
     """
     cette classe permet de créer et récuperer tous les incidents
@@ -885,20 +927,24 @@ class ParticipateAPIView(generics.CreateAPIView):
     request=ParticipateSerializer,
     responses={201: ParticipateSerializer, 400: "serializer error"},  
 )
-class ParticipateAPIListView(generics.CreateAPIView):
-    permission_classes = (
-    )
+class ParticipateAPIListView(generics.ListCreateAPIView):
+    permission_classes = ()
     queryset = Participate.objects.all()
     serializer_class = ParticipateSerializer
+    pagination_class = PageNumberPagination
 
-    def get(self, request, format=None):
-        items = Participate.objects.order_by('pk')
-        paginator = PageNumberPagination()
-        result_page = paginator.paginate_queryset(items, request)
-        serializer = ParticipateSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+    def get(self, request, *args, **kwargs):
+        self.pagination_class.page_size = 10  # Nombre d'éléments par page
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-    def post(self, request, format=None):
+    def post(self, request, *args, **kwargs):
         serializer = ParticipateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -959,39 +1005,45 @@ class EluAPIListView(generics.CreateAPIView):
     request=UserEluSerializer,
     responses={201: UserEluSerializer, 400: "serializer error"},  
 )
-class EluToZoneAPIListView(generics.CreateAPIView):
-    permission_classes = (
-    )
+class EluToZoneAPIListView(generics.ListCreateAPIView):
+    permission_classes = ()
     queryset = User.objects.all()
     serializer_class = EluToZoneSerializer
 
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
     def post(self, request, format=None):
-        elu = User.objects.get(id=request.data['elu'])
-        zone = Zone.objects.get(id=request.data['zone'])
-        if zone != None and elu != None:
-            elu.zones.add(zone)
-            return Response({
-                "status": "success",
-                "message": "elu attribuated to zone"
-            })
-        return Response(serializer.errors, status=400)
+        try:
+            elu = User.objects.get(id=request.data['elu'])
+            zone = Zone.objects.get(id=request.data['zone'])
+            if zone and elu:
+                elu.zones.add(zone)
+                return Response({
+                    "status": "success",
+                    "message": "elu attributed to zone"
+                })
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @extend_schema(
     description="Endpoint allowing retrivial of citizen.",
     responses={200: UserSerializer, 404: "Citizen not found"},  
 )
-class CitizenAPIListView(generics.CreateAPIView):
-    permission_classes = (
-    )
-    queryset = User.objects.all()
+class CitizenAPIListView(generics.ListAPIView):
+    permission_classes = ()
+    queryset = User.objects.filter(user_type='citizen').order_by('pk')
     serializer_class = UserSerializer
+    pagination_class = PageNumberPagination
 
-    def get(self, request, format=None):
-        items = User.objects.filter(user_type='citizen').order_by('pk')
-        paginator = PageNumberPagination()
-        result_page = paginator.paginate_queryset(items, request)
-        serializer = UserSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+    def get(self, request, *args, **kwargs):
+        self.pagination_class.page_size = 10  # Modifier ici pour définir la taille de la page
+        return self.list(request, *args, **kwargs)
 
 @extend_schema(
     description="Endpoint allowing retrival of user.",
@@ -1063,20 +1115,20 @@ class ZoneAPIView(generics.CreateAPIView):
     request=ZoneSerializer,
     responses={201: ZoneSerializer, 400: "Bad request"},  
 )
-class ZoneAPIListView(generics.CreateAPIView):
+class ZoneAPIListView(generics.ListCreateAPIView):
     permission_classes = (
     )
     queryset = Zone.objects.all()
     serializer_class = ZoneSerializer
+    pagination_class = PageNumberPagination
 
-    def get(self, request, format=None):
-        items = Zone.objects.order_by('pk')
-        paginator = PageNumberPagination()
-        result_page = paginator.paginate_queryset(items, request)
-        serializer = ZoneSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+    def get(self, request, format=None, *args, **kwargs):
+        try:
+            return self.list(request, *args, **kwargs)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request, format=None):
+    def post(self, request, format=None, *args, **kwargs):
         serializer = ZoneSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -1197,35 +1249,30 @@ class MessageByZoneAPIView(generics.CreateAPIView):
     request=IncidentSerializer,
     responses={200: IncidentSerializer, 404: "Incident not found"},  
 )
-class IncidentByMonthAPIListView(generics.CreateAPIView):
-    permission_classes = (
-    )
+class IncidentByMonthAPIListView(generics.ListAPIView):
+    permission_classes = ()
     queryset = Incident.objects.all()
     serializer_class = IncidentSerializer
 
-    def get(self, request, format=None):
+    def list(self, request, *args, **kwargs):
         now = timezone.now()
-        items = Incident.objects.filter(created_at__year=now.year)
-        months = items.datetimes("created_at", kind="month")
+        month_param = self.request.query_params.get('month', None)
+        if month_param:
+            try:
+                month = int(month_param)
+                items = Incident.objects.filter(created_at__year=now.year, created_at__month=month)
+            except ValueError:
+                return Response({"error": "Invalid month parameter"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            items = Incident.objects.filter(created_at__year=now.year)
 
-        listData = []
-        for month in months:
-            # month_invs = items.filter(created_at__month=month.month).filter(created_at__year=now.year)
-            month_invs = items.filter(created_at__month=month.month)
-            month_total = month_invs.count()
-            month_resolved = month_invs.filter(etat="resolved").count()
-            month_unresolved = month_invs.filter(etat="declared").count()
-
-            # print(f"Month: {month}, Total: {month_total}")
-            dataMonth = {"month": month, "total": month_total, "resolved": month_resolved,
-                         "unresolved": month_unresolved}
-            listData.append(dataMonth)
-
+        serializer = self.get_serializer(items, many=True)
         return Response({
             "status": "success",
-            "message": "incidents by month ",
-            "data": listData
+            "message": "Incidents by month",
+            "data": serializer.data
         }, status=status.HTTP_200_OK)
+
 
 @extend_schema(
     description="Endpoint allowing retrieval of incident by month on zone.",
@@ -1377,25 +1424,23 @@ class CategoryAPIView(generics.CreateAPIView):
     request=CategorySerializer,
     responses={201: CategorySerializer, 400: "serializer error"},  
 )
-class CategoryAPIListView(generics.CreateAPIView):
-    permission_classes = (
-    )
+class CategoryAPIListView(generics.ListCreateAPIView):
+    permission_classes = ()
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = PageNumberPagination
 
-    def get(self, request, format=None):
-        items = Category.objects.order_by('pk')
-        paginator = PageNumberPagination()
-        result_page = paginator.paginate_queryset(items, request)
-        serializer = CategorySerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request, format=None):
-        serializer = CategorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @extend_schema(
     description="Endpoint allowing retrival, updating, and deletion of an indicator",
@@ -1890,3 +1935,112 @@ class ImageBackgroundAPIListView(generics.CreateAPIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+    
+
+class OverpassApiIntegration(generics.CreateAPIView):
+    permission_classes = ()
+    queryset = Incident.objects.all()
+    serializer_class = IncidentSerializer
+    @extend_schema(
+        description="This endpoint retrieves the locality information of incidents based on their geographic coordinates."
+        "It accepts latitude and longitude parameters to specify the location around which to search for incidents."
+        " The endpoint queries amenities such as pharmacies, mosques, schools, restaurants, bars, prisons, rivers, and marigots"
+        " within a 500-meter radius of the specified coordinates. It then returns a list of incidents found in the vicinity, "
+        "including details such as the type of amenity and its name.",
+        responses={200: IncidentSerializer(many=True), 404: "Not Found"},
+    )
+    def get(self, request, *args, **kwargs):
+        lat = request.GET.get("latitude")
+        lon = request.GET.get("longitude")
+        query = f"""
+        [out:json];
+        (
+            node["amenity"="pharmacy"](around:500, {lat}, {lon});
+            node["amenity"="mosque"](around:500, {lat}, {lon});
+            node["amenity"="school"](around:500, {lat}, {lon});
+            node["amenity"="restaurant"](around:500, {lat}, {lon});
+            node["amenity"="bar"](around:500, {lat}, {lon});
+            node["amenity"="prison"](around:500, {lat}, {lon});
+            node["amenity"="river"](around:500, {lat}, {lon});
+            node["amenity"="marigot"](around:500, {lat}, {lon});
+            node["amenity"="clinic"](around:500, {lat}, {lon});
+        );
+        out body;
+        >;
+        out skel qt;
+        """
+        api = overpy.Overpass()
+        result = api.query(query)
+        results_list = []
+        for node in result.nodes:
+            result_item = {
+                "amenity": node.tags.get("amenity", ""),
+                "name": node.tags.get("name", ""),
+                
+            }
+            results_list.append(result_item)
+
+        return HttpResponse(json.dumps(results_list))
+
+class PhoneOTPView(generics.CreateAPIView):
+    permission_classes = ()
+    queryset = PhoneOTP.objects.all()
+    serializer_class = PhoneOTPSerializer
+    @extend_schema(
+        description="Endpoint for generate otp code",
+        responses={200: "generate", 400: "Bad request"},
+    )
+    def generate_otp(self, phone_number):
+        secret_key = pyotp.random_base32()
+        otp = pyotp.TOTP(secret_key)
+        otp_code = otp.now()
+        otp_code_str = str(otp_code)
+        PhoneOTP.objects.create(phone_number=phone_number, otp_code=otp_code_str)
+        return otp_code_str
+    
+    @extend_schema(
+        description="Endpoint for retrivial a code otp",
+        request=PhoneOTPSerializer,
+        responses={200: PhoneOTPSerializer, 404: "Not Found"},
+    )
+    def get(self, request, *args, **kwargs):
+        phone_number = request.query_params.get('phone_number')
+        if not phone_number:
+            raise ValidationError("Le numéro de téléphone est requis.")
+        try:
+            otp_instance = PhoneOTP.objects.get(phone_number=phone_number)
+        except PhoneOTP.DoesNotExist:
+            raise NotFound("Code OTP non trouvé pour ce numéro de téléphone.")
+        return Response({'otp_code': otp_instance.otp_code}, status=status.HTTP_200_OK)
+    
+    @extend_schema(
+        description="Endpoint for creating a code otp",
+        request=PhoneOTPSerializer,
+        responses={201: PhoneOTPSerializer, 400: "Bad request"},
+    )
+    def post(self, request, *args, **kwargs):
+        phone_number = request.data.get('phone_number')
+        if not phone_number:
+            raise ValidationError("Le numéro de téléphone est requis.")
+        otp_code = self.generate_otp(phone_number)
+        if send_sms(phone_number, otp_code):
+            return Response({'otp_code': otp_code}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'message': 'Erreur lors de l\'envoi du SMS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def send_sms(phone_number, otp_code):
+    account_sid = os.environ['TWILIO_ACCOUNT_SID']
+    auth_token = os.environ['TWILIO_AUTH_TOKEN']
+    twilio_phone = os.environ['TWILIO_PHONE_NUMBER']
+    client = Client(account_sid, auth_token)
+    message_body = f"Votre code de vérification OTP est : {otp_code}"
+    message = client.messages.create(
+        body=message_body,
+        from_=twilio_phone,
+        to=phone_number
+    )
+    if message.sid:
+        return True
+    else:
+        return False

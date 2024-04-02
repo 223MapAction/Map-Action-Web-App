@@ -1,0 +1,23 @@
+name: API-Deploye
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - dev
+      
+jobs:
+  build-and-test:
+    runs-on: self-hosted
+      
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Build and Run Docker Compose
+        working-directory: MapAction
+        run: |
+          docker-compose -f _cd_pipeline.yml up --build -d
+      

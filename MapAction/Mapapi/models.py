@@ -143,10 +143,11 @@ class Incident(models.Model):
                              null=True)
     zone = models.CharField(max_length=250, blank=False,
                             null=False)
+    prediction = models.TextField(max_length=250, blank=True, null=True)
     description = models.TextField(max_length=500, blank=True, null=True)
-    photo = models.ImageField(null=True, blank=True)
-    video = models.FileField(blank=True, null=True)
-    audio = models.FileField(blank=True, null=True)
+    photo = models.ImageField(upload_to='uploads/',null=True, blank=True)
+    video = models.FileField(upload_to='uploads/',blank=True, null=True)
+    audio = models.FileField(upload_to='uploads/',blank=True, null=True)
     user_id = models.ForeignKey('User', db_column='user_incid_id', related_name='user_incident',
                                 on_delete=models.CASCADE, null=True)
     lattitude = models.CharField(max_length=250, blank=True,
@@ -319,6 +320,12 @@ class PasswordReset(models.Model):
 class ImageBackground(models.Model):
     photo = models.ImageField(null=True, blank=True)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+
+# verification code otp
+class PhoneOTP(models.Model):
+    phone_number = models.CharField(max_length=15)
+    otp_code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
 
 

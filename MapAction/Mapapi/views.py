@@ -29,11 +29,11 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives, send_mail
 import random
 import string
-<<<<<<< HEAD
+
 import httpx
 from celery.result import AsyncResult
 from .tasks import prediction_task
-=======
+
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.settings import api_settings
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
@@ -43,7 +43,7 @@ import pyotp
 import os
 from twilio.rest import Client
 
->>>>>>> df16489ae8bf232da88b6fc76a0e4cdad9fdbe57
+
 
 
 class CustomPageNumberPagination(PageNumberPagination):

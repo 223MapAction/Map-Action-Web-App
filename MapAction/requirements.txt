@@ -25,4 +25,5 @@ django-http-exceptions==1.4.0
 drf-spectacular==0.27.1
 overpy==0.7
 pyotp==2.9.0
-twillio==9.0.1
+twilio==9.0.3
+

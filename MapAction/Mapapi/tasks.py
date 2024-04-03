@@ -7,7 +7,7 @@ import requests
 @shared_task
 def prediction_task(image_name, longitude):
     
-    sensitive_structures = ""2
+    sensitive_structures = ""
     
     fastapi_url = "http://192.168.0.10:8001/api1/image/predict/"
     payload = {"image_name": image_name, "sensitive_structures": sensitive_structures}

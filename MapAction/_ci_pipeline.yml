@@ -10,22 +10,5 @@ services:
       - "8000:8000"  # Adjust the port as needed
     volumes:
       - .:/app  
-    environment:
-        # Mount the current directory to /app in the container
-      - SECRET_KEY=${SECRET_KEY}
-      - DB_HOST=${DB_HOST}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - TEST_POSTGRES_DB=${TEST_POSTGRES_DB}
-      - PORT=${PORT}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
-      - WEB_CLIENT_ID=${WEB_CLIENT_ID}
-      - WEB_CLIENT_SECRET=${WEB_CLIENT_SECRET}
-      - ANDROID_CLIENT_ID=${ANDROID_CLIENT_ID}
-      - IOS_CLIENT_ID=${IOS_CLIENT_ID}
-      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
-      - DJANGO_SUPER_USER_EMAIL=${DJANGO_SUPER_USER_EMAIL}
-      - DJANGO_SUPER_PASSWORD=${DJANGO_SUPER_PASSWORD}
-      - DJANGO_SUPERUSER_FIRST_NAME=${DJANGO_SUPERUSER_FIRST_NAME}
-      - DJANGO_SUPERUSER_LAST_NAME=${DJANGO_SUPERUSER_LAST_NAME}
+    env_file:
+     - ~/.dev.env

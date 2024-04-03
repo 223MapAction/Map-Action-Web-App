@@ -5,10 +5,11 @@ services:
 
 
   postgres-db:
+      container_name: postgres-db
       build:
         context: ./services/db/
       env_file:
-        - ./.env/.dev.env
+        - ~/.dev.env
       ports:
         - "5432:5432"
       volumes:
@@ -19,23 +20,44 @@ services:
          ipv4_address: 192.168.0.2
 
   api-server:
-      container_name: api_server
+      container_name: api-server
       build:
         context: .
-        dockerfile: Dockerfile.api
+        dockerfile: ./services/api/Dockerfile.api
       command: >
             sh -c "python3 manage.py makemigrations &&
                     python3 manage.py migrate &&
                   python3 manage.py wait_for_db &&
-                  gunicorn backend.wsgi:application --bind 0.0.0.0:8000"
+                  daphne backend.asgi:application -p 8000 -b 0.0.0.0"
       volumes:
         - ~/uploads:/app/uploads
       expose:
         - 8000
       env_file:
-        - ./.env/.dev.env
+        - ~/.dev.env
+      #environment:
+        #- ./.env/.dev.env
+        #- SECRET_KEY=${SECRET_KEY}
+        #- DB_HOST=${DB_HOST}
+        #- POSTGRES_DB=${POSTGRES_DB}
+        #- POSTGRES_USER=${POSTGRES_USER}
+        #- POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        #- TEST_POSTGRES_DB=${TEST_POSTGRES_DB}
+        #- PORT=${PORT}
+        #- ALLOWED_HOSTS=${ALLOWED_HOSTS}
+        #- WEB_CLIENT_ID=${WEB_CLIENT_ID}
+        #- WEB_CLIENT_SECRET=${WEB_CLIENT_SECRET}
+        #- ANDROID_CLIENT_ID=${ANDROID_CLIENT_ID}
+        #- IOS_CLIENT_ID=${IOS_CLIENT_ID}
+        #- DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+        #- DJANGO_SUPER_USER_EMAIL=${DJANGO_SUPER_USER_EMAIL}
+        #- DJANGO_SUPER_PASSWORD=${DJANGO_SUPER_PASSWORD}
+        #- DJANGO_SUPERUSER_FIRST_NAME=${DJANGO_SUPERUSER_FIRST_NAME}
+        #- DJANGO_SUPERUSER_LAST_NAME=${DJANGO_SUPERUSER_LAST_NAME}
       depends_on:
         - postgres-db
+        - redis
+        - celery
       networks:
         micro-services-network:
           ipv4_address: 192.168.0.3
@@ -57,7 +79,7 @@ services:
 
 
   nginx:
-    container_name: api_getway
+    container_name: api-gateway
     build:
       context: ./services/nginx/
     ports:
@@ -68,8 +90,49 @@ services:
       micro-services-network:
         ipv4_address: 192.168.0.5
     restart: on-failure
-        
+  
 
+  redis:
+    container_name: redis-server
+    build:
+      context: ./services/redis/
+    ports:
+      - "6370:6370"
+    networks:
+        micro-services-network:
+          ipv4_address: 192.168.0.7
+    volumes:
+      - ~/redis_data:/data
+
+  
+  celery:
+    container_name: celery_worker
+    build:
+      context: .
+      dockerfile: ./services/celery/Dockerfile.worker
+    command: celery -A backend worker --loglevel=info
+    volumes:
+      - ~/celery_store:/celery-data
+    depends_on:
+      - redis
+    networks:
+        micro-services-network:
+          ipv4_address: 192.168.0.8
+
+
+  celery-beat:
+    container_name: celery_beat
+    build:
+      context: .
+      dockerfile: ./services/celery/Dockerfile.beat
+    command: celery -A backend beat --loglevel=info
+    volumes:
+      - ~/celery_store:/celery_data
+    depends_on:
+      - redis
+    networks:
+      micro-services-network:
+        ipv4_address: 192.168.0.9
 
 
 networks:

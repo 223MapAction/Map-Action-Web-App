@@ -1701,7 +1701,6 @@ class PasswordResetView(generics.CreateAPIView):
 
             passReset = PasswordReset.objects.filter(
                 user=user_, code=code_, used=False).order_by('-date_created').first()
-            # print(passReset)
             if passReset is None:
                 return Response({
                     "status": "failure",
@@ -1740,10 +1739,6 @@ class PasswordResetRequestView(generics.CreateAPIView):
     serializer_class = RequestPasswordSerializer
 
     def post(self, request, *args, **kwargs):
-
-        # get user using email
-        # if user
-
         if 'email' not in request.data or request.data['email'] is None:
             return Response({
                 "status": "failure",
@@ -1753,18 +1748,11 @@ class PasswordResetRequestView(generics.CreateAPIView):
 
         try:
             user_ = User.objects.get(email=request.data['email'])
-            # generate random code
             code_ = get_random()
-            # crete and save pr object
             PasswordReset.objects.create(
                 user=user_,
                 code=code_
             )
-
-            # subject = 'Réinitialisation mot de passe' message = " Vous avez oublié votre mot de passe ? Pas de
-            # panique!  Vous pouvez le réinitialiser en utilisant le code suivant  et en indiquant votre nouveau mot
-            # de passe. "+code_ email_from = settings.EMAIL_HOST_USER recipient_list = [user_.email,] send_mail(
-            # subject, message, email_from, recipient_list )
             subject, from_email, to = '[MAP ACTION] - Votre code de reinitialisation', settings.EMAIL_HOST_USER, user_.email
             html_content = render_to_string('mail_pwd.html', {'code': code_})  # render with dynamic value#
             text_content = strip_tags(html_content)  # Strip the html tag. So people can see the pure text at least.
@@ -2044,3 +2032,26 @@ def send_sms(phone_number, otp_code):
         return True
     else:
         return False
+    
+
+class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
+    permission_classes = ()
+    queryset = Collaboration.objects.all()
+    serializer_class = CollaborationSerializer
+    @extend_schema(
+        description="Endpoint for creating a collaboration",
+        responses={200: "generate", 400: "Bad request"},
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = CollaborationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # return super().post(request, *args, **kwargs)
+    @extend_schema(
+        description="Endpoint for retrieving all collaborations",
+        responses={200: CollaborationSerializer(many=True)},
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)

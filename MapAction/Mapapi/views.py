@@ -1700,7 +1700,6 @@ class PasswordResetView(generics.CreateAPIView):
 
             passReset = PasswordReset.objects.filter(
                 user=user_, code=code_, used=False).order_by('-date_created').first()
-            # print(passReset)
             if passReset is None:
                 return Response({
                     "status": "failure",
@@ -1739,10 +1738,6 @@ class PasswordResetRequestView(generics.CreateAPIView):
     serializer_class = RequestPasswordSerializer
 
     def post(self, request, *args, **kwargs):
-
-        # get user using email
-        # if user
-
         if 'email' not in request.data or request.data['email'] is None:
             return Response({
                 "status": "failure",
@@ -1752,18 +1747,11 @@ class PasswordResetRequestView(generics.CreateAPIView):
 
         try:
             user_ = User.objects.get(email=request.data['email'])
-            # generate random code
             code_ = get_random()
-            # crete and save pr object
             PasswordReset.objects.create(
                 user=user_,
                 code=code_
             )
-
-            # subject = 'Réinitialisation mot de passe' message = " Vous avez oublié votre mot de passe ? Pas de
-            # panique!  Vous pouvez le réinitialiser en utilisant le code suivant  et en indiquant votre nouveau mot
-            # de passe. "+code_ email_from = settings.EMAIL_HOST_USER recipient_list = [user_.email,] send_mail(
-            # subject, message, email_from, recipient_list )
             subject, from_email, to = '[MAP ACTION] - Votre code de reinitialisation', settings.EMAIL_HOST_USER, user_.email
             html_content = render_to_string('mail_pwd.html', {'code': code_})  # render with dynamic value#
             text_content = strip_tags(html_content)  # Strip the html tag. So people can see the pure text at least.
@@ -1981,65 +1969,88 @@ class OverpassApiIntegration(generics.CreateAPIView):
 
         return HttpResponse(json.dumps(results_list))
 
-class PhoneOTPView(generics.CreateAPIView):
+# class PhoneOTPView(generics.CreateAPIView):
+#     permission_classes = ()
+#     queryset = PhoneOTP.objects.all()
+#     serializer_class = PhoneOTPSerializer
+#     @extend_schema(
+#         description="Endpoint for generate otp code",
+#         responses={200: "generate", 400: "Bad request"},
+#     )
+#     def generate_otp(self, phone_number):
+#         secret_key = pyotp.random_base32()
+#         otp = pyotp.TOTP(secret_key)
+#         otp_code = otp.now()
+#         otp_code_str = str(otp_code)
+#         PhoneOTP.objects.create(phone_number=phone_number, otp_code=otp_code_str)
+#         return otp_code_str
+    
+#     @extend_schema(
+#         description="Endpoint for retrivial a code otp",
+#         request=PhoneOTPSerializer,
+#         responses={200: PhoneOTPSerializer, 404: "Not Found"},
+#     )
+#     def get(self, request, *args, **kwargs):
+#         phone_number = request.query_params.get('phone_number')
+#         if not phone_number:
+#             raise ValidationError("Le numéro de téléphone est requis.")
+#         try:
+#             otp_instance = PhoneOTP.objects.get(phone_number=phone_number)
+#         except PhoneOTP.DoesNotExist:
+#             raise NotFound("Code OTP non trouvé pour ce numéro de téléphone.")
+#         return Response({'otp_code': otp_instance.otp_code}, status=status.HTTP_200_OK)
+    
+#     @extend_schema(
+#         description="Endpoint for creating a code otp",
+#         request=PhoneOTPSerializer,
+#         responses={201: PhoneOTPSerializer, 400: "Bad request"},
+#     )
+#     def post(self, request, *args, **kwargs):
+#         phone_number = request.data.get('phone_number')
+#         if not phone_number:
+#             raise ValidationError("Le numéro de téléphone est requis.")
+#         otp_code = self.generate_otp(phone_number)
+#         if send_sms(phone_number, otp_code):
+#             return Response({'otp_code': otp_code}, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response({'message': 'Erreur lors de l\'envoi du SMS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# def send_sms(phone_number, otp_code):
+#     account_sid = os.environ['TWILIO_ACCOUNT_SID']
+#     auth_token = os.environ['TWILIO_AUTH_TOKEN']
+#     twilio_phone = os.environ['TWILIO_PHONE_NUMBER']
+#     client = Client(account_sid, auth_token)
+#     message_body = f"Votre code de vérification OTP est : {otp_code}"
+#     message = client.messages.create(
+#         body=message_body,
+#         from_=twilio_phone,
+#         to=phone_number
+#     )
+#     if message.sid:
+#         return True
+#     else:
+#         return False
+    
+
+class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
     permission_classes = ()
-    queryset = PhoneOTP.objects.all()
-    serializer_class = PhoneOTPSerializer
+    queryset = Collaboration.objects.all()
+    serializer_class = CollaborationSerializer
     @extend_schema(
-        description="Endpoint for generate otp code",
+        description="Endpoint for creating a collaboration",
         responses={200: "generate", 400: "Bad request"},
     )
-    def generate_otp(self, phone_number):
-        secret_key = pyotp.random_base32()
-        otp = pyotp.TOTP(secret_key)
-        otp_code = otp.now()
-        otp_code_str = str(otp_code)
-        PhoneOTP.objects.create(phone_number=phone_number, otp_code=otp_code_str)
-        return otp_code_str
-    
+    def post(self, request, *args, **kwargs):
+        serializer = CollaborationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # return super().post(request, *args, **kwargs)
     @extend_schema(
-        description="Endpoint for retrivial a code otp",
-        request=PhoneOTPSerializer,
-        responses={200: PhoneOTPSerializer, 404: "Not Found"},
+        description="Endpoint for retrieving all collaborations",
+        responses={200: CollaborationSerializer(many=True)},
     )
     def get(self, request, *args, **kwargs):
-        phone_number = request.query_params.get('phone_number')
-        if not phone_number:
-            raise ValidationError("Le numéro de téléphone est requis.")
-        try:
-            otp_instance = PhoneOTP.objects.get(phone_number=phone_number)
-        except PhoneOTP.DoesNotExist:
-            raise NotFound("Code OTP non trouvé pour ce numéro de téléphone.")
-        return Response({'otp_code': otp_instance.otp_code}, status=status.HTTP_200_OK)
-    
-    @extend_schema(
-        description="Endpoint for creating a code otp",
-        request=PhoneOTPSerializer,
-        responses={201: PhoneOTPSerializer, 400: "Bad request"},
-    )
-    def post(self, request, *args, **kwargs):
-        phone_number = request.data.get('phone_number')
-        if not phone_number:
-            raise ValidationError("Le numéro de téléphone est requis.")
-        otp_code = self.generate_otp(phone_number)
-        if send_sms(phone_number, otp_code):
-            return Response({'otp_code': otp_code}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({'message': 'Erreur lors de l\'envoi du SMS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-def send_sms(phone_number, otp_code):
-    account_sid = os.environ['TWILIO_ACCOUNT_SID']
-    auth_token = os.environ['TWILIO_AUTH_TOKEN']
-    twilio_phone = os.environ['TWILIO_PHONE_NUMBER']
-    client = Client(account_sid, auth_token)
-    message_body = f"Votre code de vérification OTP est : {otp_code}"
-    message = client.messages.create(
-        body=message_body,
-        from_=twilio_phone,
-        to=phone_number
-    )
-    if message.sid:
-        return True
-    else:
-        return False
+        return self.list(request, *args, **kwargs)

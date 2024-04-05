@@ -1,8 +1,9 @@
 import subprocess
-
+from django.db.models import Q
 from django.shortcuts import render, HttpResponse
 from django.core.serializers import serialize
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from .serializer import *
@@ -1969,68 +1970,68 @@ class OverpassApiIntegration(generics.CreateAPIView):
 
         return HttpResponse(json.dumps(results_list))
 
-# class PhoneOTPView(generics.CreateAPIView):
-#     permission_classes = ()
-#     queryset = PhoneOTP.objects.all()
-#     serializer_class = PhoneOTPSerializer
-#     @extend_schema(
-#         description="Endpoint for generate otp code",
-#         responses={200: "generate", 400: "Bad request"},
-#     )
-#     def generate_otp(self, phone_number):
-#         secret_key = pyotp.random_base32()
-#         otp = pyotp.TOTP(secret_key)
-#         otp_code = otp.now()
-#         otp_code_str = str(otp_code)
-#         PhoneOTP.objects.create(phone_number=phone_number, otp_code=otp_code_str)
-#         return otp_code_str
+class PhoneOTPView(generics.CreateAPIView):
+    permission_classes = ()
+    queryset = PhoneOTP.objects.all()
+    serializer_class = PhoneOTPSerializer
+    @extend_schema(
+        description="Endpoint for generate otp code",
+        responses={200: "generate", 400: "Bad request"},
+    )
+    def generate_otp(self, phone_number):
+        secret_key = pyotp.random_base32()
+        otp = pyotp.TOTP(secret_key)
+        otp_code = otp.now()
+        otp_code_str = str(otp_code)
+        PhoneOTP.objects.create(phone_number=phone_number, otp_code=otp_code_str)
+        return otp_code_str
     
-#     @extend_schema(
-#         description="Endpoint for retrivial a code otp",
-#         request=PhoneOTPSerializer,
-#         responses={200: PhoneOTPSerializer, 404: "Not Found"},
-#     )
-#     def get(self, request, *args, **kwargs):
-#         phone_number = request.query_params.get('phone_number')
-#         if not phone_number:
-#             raise ValidationError("Le numéro de téléphone est requis.")
-#         try:
-#             otp_instance = PhoneOTP.objects.get(phone_number=phone_number)
-#         except PhoneOTP.DoesNotExist:
-#             raise NotFound("Code OTP non trouvé pour ce numéro de téléphone.")
-#         return Response({'otp_code': otp_instance.otp_code}, status=status.HTTP_200_OK)
+    @extend_schema(
+        description="Endpoint for retrivial a code otp",
+        request=PhoneOTPSerializer,
+        responses={200: PhoneOTPSerializer, 404: "Not Found"},
+    )
+    def get(self, request, *args, **kwargs):
+        phone_number = request.query_params.get('phone_number')
+        if not phone_number:
+            raise ValidationError("Le numéro de téléphone est requis.")
+        try:
+            otp_instance = PhoneOTP.objects.get(phone_number=phone_number)
+        except PhoneOTP.DoesNotExist:
+            raise NotFound("Code OTP non trouvé pour ce numéro de téléphone.")
+        return Response({'otp_code': otp_instance.otp_code}, status=status.HTTP_200_OK)
     
-#     @extend_schema(
-#         description="Endpoint for creating a code otp",
-#         request=PhoneOTPSerializer,
-#         responses={201: PhoneOTPSerializer, 400: "Bad request"},
-#     )
-#     def post(self, request, *args, **kwargs):
-#         phone_number = request.data.get('phone_number')
-#         if not phone_number:
-#             raise ValidationError("Le numéro de téléphone est requis.")
-#         otp_code = self.generate_otp(phone_number)
-#         if send_sms(phone_number, otp_code):
-#             return Response({'otp_code': otp_code}, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response({'message': 'Erreur lors de l\'envoi du SMS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    @extend_schema(
+        description="Endpoint for creating a code otp",
+        request=PhoneOTPSerializer,
+        responses={201: PhoneOTPSerializer, 400: "Bad request"},
+    )
+    def post(self, request, *args, **kwargs):
+        phone_number = request.data.get('phone_number')
+        if not phone_number:
+            raise ValidationError("Le numéro de téléphone est requis.")
+        otp_code = self.generate_otp(phone_number)
+        if send_sms(phone_number, otp_code):
+            return Response({'otp_code': otp_code}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'message': 'Erreur lors de l\'envoi du SMS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# def send_sms(phone_number, otp_code):
-#     account_sid = os.environ['TWILIO_ACCOUNT_SID']
-#     auth_token = os.environ['TWILIO_AUTH_TOKEN']
-#     twilio_phone = os.environ['TWILIO_PHONE_NUMBER']
-#     client = Client(account_sid, auth_token)
-#     message_body = f"Votre code de vérification OTP est : {otp_code}"
-#     message = client.messages.create(
-#         body=message_body,
-#         from_=twilio_phone,
-#         to=phone_number
-#     )
-#     if message.sid:
-#         return True
-#     else:
-#         return False
+def send_sms(phone_number, otp_code):
+    account_sid = os.environ['TWILIO_ACCOUNT_SID']
+    auth_token = os.environ['TWILIO_AUTH_TOKEN']
+    twilio_phone = os.environ['TWILIO_PHONE_NUMBER']
+    client = Client(account_sid, auth_token)
+    message_body = f"Votre code de vérification OTP est : {otp_code}"
+    message = client.messages.create(
+        body=message_body,
+        from_=twilio_phone,
+        to=phone_number
+    )
+    if message.sid:
+        return True
+    else:
+        return False
     
 
 class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
@@ -2054,3 +2055,13 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+
+class IncidentSearchView(APIView):
+    def get(self, request):
+        search_term = request.query_params.get('search_term')
+        results = Incident.objects.filter(
+            Q(title__icontains=search_term) | Q(description__icontains=search_term)
+        )
+        serializer = IncidentSerializer(results, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

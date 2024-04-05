@@ -212,10 +212,10 @@ class EluToZoneSerializer(serializers.Serializer):
             'zone': zone
         }
 
-# class PhoneOTPSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = PhoneOTP
-#         fields = ['phone_number']
+class PhoneOTPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PhoneOTP
+        fields = ['phone_number']
 
 class CollaborationSerializer(serializers.ModelSerializer):
     class Meta:

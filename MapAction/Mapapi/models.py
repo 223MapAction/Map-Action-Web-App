@@ -335,4 +335,9 @@ class Collaboration(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     end_date = models.DateField(blank=True)
 
+class Prediction(models.Model):
+    incident = models.ForeignKey(Incident, blank=False, null=False, on_delete=models.CASCADE)
+    piste_solution = models.CharField(max_length=255)
+    impact_potentiel = models.CharField(max_length=255)
+    context = models.CharField(max_length=255)
 

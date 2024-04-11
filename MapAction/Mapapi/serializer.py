@@ -216,3 +216,8 @@ class PhoneOTPSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhoneOTP
         fields = ['phone_number']
+
+class CollaborationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collaboration
+        fields = '__all__'

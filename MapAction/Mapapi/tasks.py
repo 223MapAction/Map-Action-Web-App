@@ -5,12 +5,12 @@ import json
 import requests
 
 @shared_task
-def prediction_task(image_name, longitude):
+def prediction_task(image_name, longitude, incident_id):
     
     sensitive_structures = ""
     
-    fastapi_url = "http://192.168.0.10:8001/api1/image/predict/"
-    payload = {"image_name": image_name, "sensitive_structures": sensitive_structures}
+    fastapi_url = "http://51.159.141.113:8001/api1/image/predict/"
+    payload = {"image_name": image_name, "sensitive_structures": sensitive_structures, "incident_id": str(incident_id)}
     longitude = longitude
     
     response = requests.post(fastapi_url, json=payload)
@@ -20,9 +20,10 @@ def prediction_task(image_name, longitude):
     
     result = response.json()
     prediction = result["prediction"]
-    description = result["Context"]
+    context = result["context"]
+    in_depth = result["in_depht"]
+    piste_solution = result["piste_solution"]
 
-             # Update the incident with the matching longitude
     
     
-    return prediction, description, longitude
+    return prediction, longitude, context, in_depht, piste_solution

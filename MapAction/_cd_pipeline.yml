@@ -30,6 +30,7 @@ services:
                   daphne backend.asgi:application -p 8000 -b 0.0.0.0"
       volumes:
         - ~/uploads:/app/uploads
+        - .:/app
       expose:
         - 8000
       env_file:
@@ -62,19 +63,19 @@ services:
           ipv4_address: 192.168.0.3
 
   pgadmin:
-    container_name: pgadmin4
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: root@root.com
-      PGADMIN_DEFAULT_PASSWORD: root
-    volumes:
-      - .:/data
-      #- ~/pgadmin-data:/var/lib/pgadmin
-    ports:
-      - "5050:80"
-    networks:
-      micro-services-network:
-        ipv4_address: 192.168.0.4
+      container_name: pgadmin4
+      image: dpage/pgadmin4
+      environment:
+        PGADMIN_DEFAULT_EMAIL: root@root.com
+        PGADMIN_DEFAULT_PASSWORD: root
+      volumes:
+        - .:/data
+        #- ~/pgadmin-data:/var/lib/pgadmin
+      ports:
+        - "5050:80"
+      networks:
+        micro-services-network:
+          ipv4_address: 192.168.0.4
 
 
   nginx:

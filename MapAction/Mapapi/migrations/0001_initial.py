@@ -114,16 +114,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Prediction',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('incident', models.CharField(max_length=255)),
-                ('piste_solution', models.CharField(max_length=255)),
-                ('impact_potentiel', models.CharField(max_length=255)),
-                ('context', models.CharField(max_length=255)),
-            ],
-        ),
-        migrations.CreateModel(
             name='Zone',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -243,15 +233,5 @@ class Migration(migrations.Migration):
             model_name='communaute',
             name='zone',
             field=models.ForeignKey(db_column='zone_communaute_id', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='Zone_communaute', to='Mapapi.zone'),
-        ),
-        migrations.CreateModel(
-            name='Collaboration',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('end_date', models.DateField(blank=True)),
-                ('incident', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Mapapi.incident')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
         ),
     ]

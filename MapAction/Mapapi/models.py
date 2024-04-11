@@ -327,4 +327,16 @@ class PhoneOTP(models.Model):
     otp_code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
 
+# Collaboration table
+class Collaboration(models.Model):
+    incident = models.ForeignKey(Incident, blank=False, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=False, null=False, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateField(blank=True)
+
+class Prediction(models.Model):
+    incident = models.ForeignKey(Incident, blank=False, null=False, on_delete=models.CASCADE)
+    piste_solution = models.CharField(max_length=255)
+    impact_potentiel = models.CharField(max_length=255)
+    context = models.CharField(max_length=255)
 

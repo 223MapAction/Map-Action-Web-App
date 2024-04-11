@@ -329,7 +329,7 @@ class PhoneOTP(models.Model):
 
 # Collaboration table
 class Collaboration(models.Model):
-    incident = models.ForeignKey(Incident, blank=False, null=False, on_delete=models.CASCADE)
+    incident = models.ForeignKey('Incident', blank=False, null=False, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=False, null=False, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     end_date = models.DateField(blank=True)

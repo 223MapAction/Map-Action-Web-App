@@ -100,6 +100,6 @@ urlpatterns = [
     # Collaboration URL
     path('collaboration/', CollaborationView.as_view(), name="collaboration"),
     # Search Incident
-    path('Search/', IncidentSearchView.as_view(), name="search")
+    path('Search/', IncidentSearchView.as_view(), name="search"),
     path('prediction/', PredictionView.aw_view(), name="predicton")
 ]

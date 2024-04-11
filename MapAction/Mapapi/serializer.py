@@ -221,3 +221,8 @@ class CollaborationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collaboration
         fields = '__all__'
+
+class PredictionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Prediction
+        fields = ['id', 'incident', 'piste_solution', 'impact_potentiel', 'context']

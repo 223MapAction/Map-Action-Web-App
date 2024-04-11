@@ -9,7 +9,7 @@ on:
       - dev
       
 jobs:
-  build-and-test:
+  build-and-deploy:
     runs-on: self-hosted
       
     steps:

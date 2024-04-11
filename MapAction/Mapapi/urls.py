@@ -97,4 +97,8 @@ urlpatterns = [
     path('overpass/', OverpassApiIntegration.as_view(), name="overpassapi"),
     # OTP URL
     path('verify_otp/', PhoneOTPView.as_view(), name="verify_otp"),
+    # Collaboration URL
+    path('collaboration/', CollaborationView.as_view(), name="collaboration"),
+    # Search Incident
+    path('Search/', IncidentSearchView.as_view(), name="search")
 ]

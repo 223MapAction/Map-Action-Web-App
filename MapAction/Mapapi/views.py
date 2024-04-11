@@ -1,8 +1,9 @@
 import subprocess
-
+from django.db.models import Q
 from django.shortcuts import render, HttpResponse
 from django.core.serializers import serialize
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from .serializer import *
@@ -29,6 +30,11 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives, send_mail
 import random
 import string
+
+import httpx
+from celery.result import AsyncResult
+from .tasks import prediction_task
+
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.settings import api_settings
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
@@ -37,6 +43,7 @@ from rest_framework.exceptions import NotFound, ValidationError
 import pyotp
 import os
 from twilio.rest import Client
+
 
 
 
@@ -406,11 +413,11 @@ class IncidentAPIView(generics.CreateAPIView):
     responses={201: IncidentSerializer, 400: "Bad Request"},  
 )
 class IncidentAPIListView(generics.CreateAPIView):
-    permission_classes = (
-    )
+    permission_classes = ()
+    
     queryset = Incident.objects.all()
     serializer_class = IncidentSerializer
-
+    
     def get(self, request, format=None):
         items = Incident.objects.order_by('-pk')
         paginator = CustomPageNumberPagination()
@@ -431,51 +438,47 @@ class IncidentAPIListView(generics.CreateAPIView):
             zone.save()
         except IntegrityError:
             pass
+
         if serializer.is_valid():
             serializer.save()
+
+            image_name = serializer.data.get("photo")
+            print("Image Name:", image_name)
+
+            longitude = serializer.data.get("longitude")
+            print("Longitude:", longitude)
+            incident_instance = Incident.objects.get(longitude=longitude)
+            incident_id = incident_instance.id
+
+            result = prediction_task.delay(image_name, longitude, incident_id)
             
-             # Assuming your image field is named 'image' in your Incident model
-            image_name = serializer.data.get('photo')
-
-            # Define the FastAPI endpoint URL
-            fastapi_url = "http://192.168.1.7:8001/api1/image/predict"
-
-            # Prepare the payload with the image name
-            payload = {"image_name": image_name}
-
+            result_value = result.get()
+            
+            if result_value:
+                predictions, longitude, context, in_depth, piste_solution = result_value
+            
             try:
-                # Make a POST request to the FastAPI endpoint
-                response = requests.post(fastapi_url, json=payload)
+                
+                prediction_instance = Prediction(incident=incident_id, piste_solution=piste_solution, impact_potentiel=in_depth,
+                                                 context=context)
+                prediction_instance.save()
+                
+                print("Incident updated successfully.")
+            except Incident.DoesNotExist:
+                print(f"No incident found with longitude={longitude}")
 
-                # Check if the request was successful (status code 200)
-                if response.status_code == 200:
-                    # Parse the response JSON
-                    result = response.json()
+          
 
-                    # Extract relevant information from the result
-                    prediction = result.get("prediction")
-                    description = result.get("get_context")
+            if "user_id" in request.data:
+                user = User.objects.get(id=request.data["user_id"])
+                user.points += 1
+                user.save()
 
-                    # Do something with the prediction and description, e.g., save to Incident model
-                    incident_instance = Incident.objects.get(id=serializer.data["id"])
-                    incident_instance.prediction = prediction
-                    incident_instance.description = description
-                    incident_instance.save()
-                    
-                    
-                if "user_id" in request.data:
-                    user = User.objects.get(id=request.data["user_id"])
-                    user.points += 1
-                    user.save()
-                if "video" in request.data:
-                    subprocess.check_call(['python3', settings.BASE_DIR + '/convertvideo.py']) # convert video
+            if "video" in request.data:
+                subprocess.check_call(['python', f"{settings.BASE_DIR}" + '/convertvideo.py'])
 
-                return Response(serializer.data, status=201)
-            
+            return Response(serializer.data, status=201)
 
-            except Exception as e:
-                # Handle any exceptions that may occur during the request
-                return Response({"error": str(e)}, status=500)
         return Response(serializer.errors, status=400)
     """
     cette classe permet de créer et récuperer tous les incidents
@@ -1701,7 +1704,6 @@ class PasswordResetView(generics.CreateAPIView):
 
             passReset = PasswordReset.objects.filter(
                 user=user_, code=code_, used=False).order_by('-date_created').first()
-            # print(passReset)
             if passReset is None:
                 return Response({
                     "status": "failure",
@@ -1740,10 +1742,6 @@ class PasswordResetRequestView(generics.CreateAPIView):
     serializer_class = RequestPasswordSerializer
 
     def post(self, request, *args, **kwargs):
-
-        # get user using email
-        # if user
-
         if 'email' not in request.data or request.data['email'] is None:
             return Response({
                 "status": "failure",
@@ -1753,18 +1751,11 @@ class PasswordResetRequestView(generics.CreateAPIView):
 
         try:
             user_ = User.objects.get(email=request.data['email'])
-            # generate random code
             code_ = get_random()
-            # crete and save pr object
             PasswordReset.objects.create(
                 user=user_,
                 code=code_
             )
-
-            # subject = 'Réinitialisation mot de passe' message = " Vous avez oublié votre mot de passe ? Pas de
-            # panique!  Vous pouvez le réinitialiser en utilisant le code suivant  et en indiquant votre nouveau mot
-            # de passe. "+code_ email_from = settings.EMAIL_HOST_USER recipient_list = [user_.email,] send_mail(
-            # subject, message, email_from, recipient_list )
             subject, from_email, to = '[MAP ACTION] - Votre code de reinitialisation', settings.EMAIL_HOST_USER, user_.email
             html_content = render_to_string('mail_pwd.html', {'code': code_})  # render with dynamic value#
             text_content = strip_tags(html_content)  # Strip the html tag. So people can see the pure text at least.
@@ -2044,3 +2035,36 @@ def send_sms(phone_number, otp_code):
         return True
     else:
         return False
+    
+
+class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
+    permission_classes = ()
+    queryset = Collaboration.objects.all()
+    serializer_class = CollaborationSerializer
+    @extend_schema(
+        description="Endpoint for creating a collaboration",
+        responses={200: "generate", 400: "Bad request"},
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = CollaborationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # return super().post(request, *args, **kwargs)
+    @extend_schema(
+        description="Endpoint for retrieving all collaborations",
+        responses={200: CollaborationSerializer(many=True)},
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
+class IncidentSearchView(APIView):
+    def get(self, request):
+        search_term = request.query_params.get('search_term')
+        results = Incident.objects.filter(
+            Q(title__icontains=search_term) | Q(description__icontains=search_term)
+        )
+        serializer = IncidentSerializer(results, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -11,4 +11,4 @@ services:
     volumes:
       - .:/app  
     env_file:
-     - ~/.dev.env
+     - ./.env/.dev.env

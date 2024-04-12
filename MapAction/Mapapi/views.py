@@ -2063,13 +2063,17 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
 class IncidentSearchView(APIView):
     def get(self, request):
         search_term = request.query_params.get('search_term')
+        
+        if search_term is None:
+            return Response("Parameter 'search_term' is missing", status=status.HTTP_400_BAD_REQUEST)
+        
         results = Incident.objects.filter(
             Q(title__icontains=search_term) | Q(description__icontains=search_term)
         )
         serializer = IncidentSerializer(results, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-class PredictionView(generics.CreateAPIView):
+class PredictionView(generics.ListAPIView):
     permission_classes = ()
     queryset = Prediction.objects.all()
     serializer_class = PredictionSerializer

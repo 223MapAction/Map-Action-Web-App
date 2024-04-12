@@ -2073,7 +2073,7 @@ class IncidentSearchView(APIView):
         serializer = IncidentSerializer(results, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-class PredictionView(generics.CreateAPIView):
+class PredictionView(generics.ListAPIView):
     permission_classes = ()
     queryset = Prediction.objects.all()
     serializer_class = PredictionSerializer

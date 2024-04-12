@@ -30,11 +30,7 @@ services:
                   daphne backend.asgi:application -p 8000 -b 0.0.0.0"
       volumes:
         - ~/uploads:/app/uploads
-<<<<<<< HEAD
-        - .:/app
-=======
         #- .:/app
->>>>>>> afca00396f494bfcc0c1189559b9eb9347cbeeb7
       expose:
         - 8000
       env_file:

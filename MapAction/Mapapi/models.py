@@ -335,13 +335,9 @@ class Collaboration(models.Model):
     end_date = models.DateField(blank=True)
 
 class Prediction(models.Model):
+    incident_id = models.CharField(max_length=255, blank=False, null=False)
     piste_solution = models.CharField(max_length=255, blank=False, null=False)
     impact_potentiel = models.CharField(max_length=255, blank=False, null=False)
     context = models.CharField(max_length=255, blank=False, null=False)
 
-class ModelPrediction(models.Model):
-    incident_num = models.CharField(max_length=255, blank=False, null=False)
-    piste_solution = models.CharField(max_length=255, blank=False, null=False)
-    impact_potentiel = models.CharField(max_length=255, blank=False, null=False)
-    context = models.CharField(max_length=255, blank=False, null=False)
     

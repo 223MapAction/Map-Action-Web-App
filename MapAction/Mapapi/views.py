@@ -447,19 +447,22 @@ class IncidentAPIListView(generics.CreateAPIView):
 
             longitude = serializer.data.get("longitude")
             print("Longitude:", longitude)
+            incident_instance = Incident.objects.get(longitude=longitude)
+            incident_id = incident_instance.id
 
-            result = prediction_task.delay(image_name, longitude)
+            result = prediction_task.delay(image_name, longitude, incident_id)
             
-            #result_value = result.get()
+            result_value = result.get()
             
             if result_value:
-                prediction, description, longitude = result_value
+                predictions, longitude, context, in_depth, piste_solution = result_value
             
             try:
-                incident_instance = Incident.objects.get(longitude=longitude)
-                incident_instance.prediction = prediction
-                incident_instance.description = description
-                incident_instance.save()
+                
+                prediction_instance = Prediction(incident_id=incident_id, piste_solution=piste_solution, impact_potentiel=in_depth,
+                                                 context=context)
+                prediction_instance.save()
+                
                 print("Incident updated successfully.")
             except Incident.DoesNotExist:
                 print(f"No incident found with longitude={longitude}")
@@ -2069,3 +2072,8 @@ class IncidentSearchView(APIView):
         )
         serializer = IncidentSerializer(results, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class PredictionView(generics.CreateAPIView):
+    permission_classes = ()
+    queryset = Prediction.objects.all()
+    serializer_class = PredictionSerializer

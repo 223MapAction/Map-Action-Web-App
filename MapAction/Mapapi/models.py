@@ -143,7 +143,6 @@ class Incident(models.Model):
                              null=True)
     zone = models.CharField(max_length=250, blank=False,
                             null=False)
-    # prediction = models.TextField(max_length=250, blank=True, null=True)
     description = models.TextField(max_length=500, blank=True, null=True)
     photo = models.ImageField(upload_to='uploads/',null=True, blank=True)
     video = models.FileField(upload_to='uploads/',blank=True, null=True)
@@ -330,14 +329,15 @@ class PhoneOTP(models.Model):
 
 # Collaboration table
 class Collaboration(models.Model):
-    incident = models.ForeignKey(Incident, blank=False, null=False, on_delete=models.CASCADE)
+    incident = models.ForeignKey('Incident', blank=False, null=False, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=False, null=False, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     end_date = models.DateField(blank=True)
 
 class Prediction(models.Model):
-    incident = models.ForeignKey(Incident, blank=False, null=False, on_delete=models.CASCADE)
-    piste_solution = models.CharField(max_length=255)
-    impact_potentiel = models.CharField(max_length=255)
-    context = models.CharField(max_length=255)
+    incident_id = models.CharField(max_length=255, blank=False, null=False)
+    piste_solution = models.CharField(max_length=255, blank=False, null=False)
+    impact_potentiel = models.CharField(max_length=255, blank=False, null=False)
+    context = models.CharField(max_length=255, blank=False, null=False)
 
+    

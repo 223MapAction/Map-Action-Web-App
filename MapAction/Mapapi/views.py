@@ -459,7 +459,7 @@ class IncidentAPIListView(generics.CreateAPIView):
             
             try:
                 
-                prediction_instance = Prediction(incident=incident_id, piste_solution=piste_solution, impact_potentiel=in_depth,
+                prediction_instance = Prediction(incident_id=incident_id, piste_solution=piste_solution, impact_potentiel=in_depth,
                                                  context=context)
                 prediction_instance.save()
                 

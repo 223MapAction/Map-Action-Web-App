@@ -459,7 +459,7 @@ class IncidentAPIListView(generics.CreateAPIView):
             #if result_value:
             #    predictions, longitude, context, in_depth, piste_solution = result_value
             
-            t#ry:
+            #try:
                 
                 #prediction_instance = Prediction(incident_id=incident_id, piste_solution=piste_solution, impact_potentiel=in_depth,
                 #                                 context=context)

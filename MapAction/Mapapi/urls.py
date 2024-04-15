@@ -100,5 +100,8 @@ urlpatterns = [
     # Collaboration URL
     path('collaboration/', CollaborationView.as_view(), name="collaboration"),
     # Search Incident
-    path('Search/', IncidentSearchView.as_view(), name="search")
+    path('Search/', IncidentSearchView.as_view(), name="search"),
+    # Prediction
+    path('prediction/', PredictionView.as_view(), name="predicton"),
+    path('prediction/<int:id>', PredictionViewByID.as_view(), name="predicton")
 ]

@@ -3,13 +3,13 @@ version: '3'
 
 services:
 
-
   postgres-db:
       container_name: postgres-db
       build:
         context: ./services/db/
       env_file:
-        - ./.env/.dev.env
+        # - ./.env/.dev.env
+        - ~/.dev.env
       ports:
         - "5432:5432"
       volumes:
@@ -25,18 +25,18 @@ services:
         context: .
         dockerfile: ./services/api/Dockerfile.api
       command: >
-            sh -c "
-                  python3 manage.py showmigrations &&
+            sh -c "python3 manage.py wait_for_db &&
                   python3 manage.py makemigrations &&
                   python3 manage.py migrate &&
-                  python3 manage.py wait_for_db &&
                   daphne backend.asgi:application -p 8000 -b 0.0.0.0"
       volumes:
         - ~/uploads:/app/uploads
+        #- .:/app
       expose:
         - 8000
       env_file:
-        - ./.env/.dev.env
+        # - ./.env/.dev.env
+        - ~/.dev.env
       #environment:
         #- ./.env/.dev.env
         #- SECRET_KEY=${SECRET_KEY}
@@ -65,19 +65,19 @@ services:
           ipv4_address: 192.168.0.3
 
   pgadmin:
-    container_name: pgadmin4
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: root@root.com
-      PGADMIN_DEFAULT_PASSWORD: root
-    volumes:
-      - .:/data
-      #- ~/pgadmin-data:/var/lib/pgadmin
-    ports:
-      - "5050:80"
-    networks:
-      micro-services-network:
-        ipv4_address: 192.168.0.4
+      container_name: pgadmin4
+      image: dpage/pgadmin4
+      environment:
+        PGADMIN_DEFAULT_EMAIL: root@root.com
+        PGADMIN_DEFAULT_PASSWORD: root
+      volumes:
+        - .:/data
+        #- ~/pgadmin-data:/var/lib/pgadmin
+      ports:
+        - "5050:80"
+      networks:
+        micro-services-network:
+          ipv4_address: 192.168.0.4
 
 
   nginx:

@@ -26,4 +26,4 @@ def prediction_task(image_name, longitude, incident_id):
 
     
     
-    return prediction, longitude, context, in_depht, piste_solution
+    return prediction, longitude, context, in_depth, piste_solution

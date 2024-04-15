@@ -450,23 +450,25 @@ class IncidentAPIListView(generics.CreateAPIView):
             print("Longitude:", longitude)
             incident_instance = Incident.objects.get(longitude=longitude)
             incident_id = incident_instance.id
+            
+            print(incident_id)
 
             result = prediction_task.delay(image_name, longitude, incident_id)
             
-            result_value = result.get()
+            #result_value = result.get()
             
-            if result_value:
-                predictions, longitude, context, in_depth, piste_solution = result_value
+            #if result_value:
+            #    predictions, longitude, context, in_depth, piste_solution = result_value
             
-            try:
+            t#ry:
                 
-                prediction_instance = Prediction(incident_id=incident_id, piste_solution=piste_solution, impact_potentiel=in_depth,
-                                                 context=context)
-                prediction_instance.save()
+                #prediction_instance = Prediction(incident_id=incident_id, piste_solution=piste_solution, impact_potentiel=in_depth,
+                #                                 context=context)
+                #prediction_instance.save()
                 
-                print("Incident updated successfully.")
-            except Incident.DoesNotExist:
-                print(f"No incident found with longitude={longitude}")
+                #print("Incident updated successfully.")
+            #except Incident.DoesNotExist:
+                #print(f"No incident found with longitude={longitude}")
 
           
 

@@ -2,7 +2,7 @@ import subprocess
 from django.db.models import Q
 from django.shortcuts import render, HttpResponse
 from django.core.serializers import serialize
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -2088,3 +2088,13 @@ class PredictionViewByID(generics.ListAPIView):
         incident_id = self.kwargs['id']
         queryset = Prediction.objects.filter(incident_id=incident_id)
         return queryset
+
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Notification.objects.filter(user=user)

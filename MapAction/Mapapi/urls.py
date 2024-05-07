@@ -103,5 +103,7 @@ urlpatterns = [
     path('Search/', IncidentSearchView.as_view(), name="search"),
     # Prediction
     path('prediction/', PredictionView.as_view(), name="predicton"),
-    path('prediction/<int:id>', PredictionViewByID.as_view(), name="predicton")
+    path('prediction/<int:id>', PredictionViewByID.as_view(), name="predicton"),
+    # Notification
+    path('notifications/', NotificationViewSet.as_view({'get': 'list'}), name="notification")
 ]

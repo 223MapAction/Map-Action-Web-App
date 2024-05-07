@@ -340,4 +340,11 @@ class Prediction(models.Model):
     impact_potentiel = models.TextField()
     context = models.TextField()
 
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+
     

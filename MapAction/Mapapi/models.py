@@ -336,8 +336,20 @@ class Collaboration(models.Model):
 
 class Prediction(models.Model):
     incident_id = models.CharField(max_length=255, blank=False, null=False)
-    piste_solution = models.TextField()
-    impact_potentiel = models.TextField()
-    context = models.TextField()
+    incident_type = models.CharField(max_length=255, blank=False, null=False)
+    piste_solution = models.TextField(blank=False, null=False)
+    impact_potentiel = models.TextField(blank=False, null=False)
+    context = models.TextField(blank=False, null=False)
 
-    
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+
+
+class ChatHistory(models.Model):
+    session_id = models.CharField(max_length=255, db_index=True)
+    question = models.TextField(db_index=True)
+    answer = models.TextField(db_index=True)

@@ -34,7 +34,7 @@ import string
 
 import httpx
 from celery.result import AsyncResult
-from .tasks import prediction_task
+from .tasks import prediction_task, OverpassCall
 
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.settings import api_settings
@@ -447,26 +447,28 @@ class IncidentAPIListView(generics.CreateAPIView):
             print("Image Name:", image_name)
 
             longitude = serializer.data.get("longitude")
+            latitude = serializer.data.get("lattitude")
             print("Longitude:", longitude)
             incident_instance = Incident.objects.get(longitude=longitude)
             incident_id = incident_instance.id
-
-            result = prediction_task.delay(image_name, longitude, incident_id)
             
-            result_value = result.get()
+            print(incident_id)
+            result = prediction_task.delay(image_name, longitude, latitude, incident_id)
             
-            if result_value:
-                predictions, longitude, context, in_depth, piste_solution = result_value
+            #result_value = result.get()
             
-            try:
+            #if result_value:
+            #    predictions, longitude, context, in_depth, piste_solution = result_value
+            
+            #try:
                 
-                prediction_instance = Prediction(incident_id=incident_id, piste_solution=piste_solution, impact_potentiel=in_depth,
-                                                 context=context)
-                prediction_instance.save()
+                #prediction_instance = Prediction(incident_id=incident_id, piste_solution=piste_solution, impact_potentiel=in_depth,
+                #                                 context=context)
+                #prediction_instance.save()
                 
-                print("Incident updated successfully.")
-            except Incident.DoesNotExist:
-                print(f"No incident found with longitude={longitude}")
+                #print("Incident updated successfully.")
+            #except Incident.DoesNotExist:
+                #print(f"No incident found with longitude={longitude}")
 
           
 
@@ -2080,6 +2082,30 @@ class PredictionView(generics.ListAPIView):
     queryset = Prediction.objects.all()
     serializer_class = PredictionSerializer
 
+    
+def history_list(request):
+    histories = ChatHistory.objects.all()  # Retrieve all history records
+    data = {"histories": list(histories.values("session_id", "question", "answer"))}
+    return JsonResponse(data)
+
+@csrf_exempt  # Disable CSRF token for this view for simplicity
+def add_history(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            history = History(
+                user_id=data['session_id'],
+                question=data['question'],
+                answer=data['answer']
+            )
+            history.save()
+            return JsonResponse({"message": "History added successfully!"}, status=201)
+        except (KeyError, TypeError) as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    else:
+        return HttpResponse(status=405)  # Method Not Allowed
+
+
 class PredictionViewByID(generics.ListAPIView):
     permission_classes = ()
     serializer_class = PredictionSerializer
@@ -2098,3 +2124,4 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return Notification.objects.filter(user=user)
+

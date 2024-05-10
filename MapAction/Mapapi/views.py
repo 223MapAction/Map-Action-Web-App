@@ -33,7 +33,7 @@ import string
 
 import httpx
 from celery.result import AsyncResult
-from .tasks import prediction_task
+from .tasks import prediction_task, OverpassCall
 
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.settings import api_settings
@@ -446,13 +446,13 @@ class IncidentAPIListView(generics.CreateAPIView):
             print("Image Name:", image_name)
 
             longitude = serializer.data.get("longitude")
+            latitude = serializer.data.get("lattitude")
             print("Longitude:", longitude)
             incident_instance = Incident.objects.get(longitude=longitude)
             incident_id = incident_instance.id
             
             print(incident_id)
-
-            result = prediction_task.delay(image_name, longitude, incident_id)
+            result = prediction_task.delay(image_name, longitude, latitude, incident_id)
             
             #result_value = result.get()
             
@@ -2075,3 +2075,26 @@ class PredictionView(generics.CreateAPIView):
     permission_classes = ()
     queryset = Prediction.objects.all()
     serializer_class = PredictionSerializer
+    
+    
+def history_list(request):
+    histories = ChatHistory.objects.all()  # Retrieve all history records
+    data = {"histories": list(histories.values("session_id", "question", "answer"))}
+    return JsonResponse(data)
+
+@csrf_exempt  # Disable CSRF token for this view for simplicity
+def add_history(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            history = History(
+                user_id=data['session_id'],
+                question=data['question'],
+                answer=data['answer']
+            )
+            history.save()
+            return JsonResponse({"message": "History added successfully!"}, status=201)
+        except (KeyError, TypeError) as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    else:
+        return HttpResponse(status=405)  # Method Not Allowed

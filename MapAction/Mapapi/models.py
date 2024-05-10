@@ -336,8 +336,13 @@ class Collaboration(models.Model):
 
 class Prediction(models.Model):
     incident_id = models.CharField(max_length=255, blank=False, null=False)
+    incident_type = models.CharField(max_length=255, blank=False, null=False)
     piste_solution = models.CharField(max_length=255, blank=False, null=False)
     impact_potentiel = models.CharField(max_length=255, blank=False, null=False)
     context = models.CharField(max_length=255, blank=False, null=False)
 
-    
+
+class ChatHistory(models.Model):
+    session_id = models.CharField(max_length=255, db_index=True)
+    question = models.TextField(db_index=True)
+    answer = models.TextField(db_index=True)

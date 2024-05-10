@@ -13,8 +13,8 @@ services:
       ports:
         - "5432:5432"
       volumes:
-        #- ~/postgres_store:/var/lib/postgresql/data
-        - ./data/db:/var/lib/postgresql/data
+        - ~/postgres_store:/var/lib/postgresql/data
+        #- ./data/db:/var/lib/postgresql/data
       networks:
         micro-services-network:
          ipv4_address: 192.168.0.2

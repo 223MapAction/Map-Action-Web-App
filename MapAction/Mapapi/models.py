@@ -342,6 +342,13 @@ class Prediction(models.Model):
     context = models.TextField(blank=False, null=False)
 
 
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+
+
 class ChatHistory(models.Model):
     session_id = models.CharField(max_length=255, db_index=True)
     question = models.TextField(db_index=True)

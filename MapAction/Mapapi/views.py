@@ -2,7 +2,7 @@ import subprocess
 from django.db.models import Q
 from django.shortcuts import render, HttpResponse
 from django.core.serializers import serialize
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -13,6 +13,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication, BasicAuthentication
@@ -2048,12 +2049,13 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
         responses={200: "generate", 400: "Bad request"},
     )
     def post(self, request, *args, **kwargs):
-        serializer = CollaborationSerializer(data=request.data)
-        if serializer.is_valid():
+        try:
+            serializer = CollaborationSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        # return super().post(request, *args, **kwargs)
+        except ValidationError as e:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     @extend_schema(
         description="Endpoint for retrieving all collaborations",
         responses={200: CollaborationSerializer(many=True)},
@@ -2062,20 +2064,24 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
         return self.list(request, *args, **kwargs)
 
 
-class IncidentSearchView(APIView):
+class IncidentSearchView(generics.ListAPIView):
     def get(self, request):
         search_term = request.query_params.get('search_term')
+        
+        if search_term is None:
+            return Response("Parameter 'search_term' is missing", status=status.HTTP_400_BAD_REQUEST)
+        
         results = Incident.objects.filter(
             Q(title__icontains=search_term) | Q(description__icontains=search_term)
         )
         serializer = IncidentSerializer(results, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-class PredictionView(generics.CreateAPIView):
+class PredictionView(generics.ListAPIView):
     permission_classes = ()
     queryset = Prediction.objects.all()
     serializer_class = PredictionSerializer
-    
+
     
 def history_list(request):
     histories = ChatHistory.objects.all()  # Retrieve all history records
@@ -2098,3 +2104,24 @@ def add_history(request):
             return JsonResponse({"error": str(e)}, status=400)
     else:
         return HttpResponse(status=405)  # Method Not Allowed
+
+
+class PredictionViewByID(generics.ListAPIView):
+    permission_classes = ()
+    serializer_class = PredictionSerializer
+
+    def get_queryset(self):
+        incident_id = self.kwargs['id']
+        queryset = Prediction.objects.filter(incident_id=incident_id)
+        return queryset
+
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Notification.objects.filter(user=user)
+

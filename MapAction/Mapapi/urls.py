@@ -104,4 +104,9 @@ urlpatterns = [
     path('prediction/', PredictionView.as_view(), name="predicton"),
     path('histories/', history_list, name='history_list'),
     path('histories/add/', add_history, name='add_history')
+    # Prediction
+    path('prediction/<int:id>', PredictionViewByID.as_view(), name="predicton"),
+    # Notification
+    path('notifications/', NotificationViewSet.as_view({'get': 'list'}), name="notification")
+
 ]

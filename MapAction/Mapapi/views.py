@@ -451,6 +451,7 @@ class IncidentAPIListView(generics.CreateAPIView):
             print("Longitude:", longitude)
             incident_instance = Incident.objects.get(longitude=longitude)
             incident_id = incident_instance.id
+
             
             print(incident_id)
             result = prediction_task.delay(image_name, longitude, latitude, incident_id)
@@ -460,6 +461,7 @@ class IncidentAPIListView(generics.CreateAPIView):
             #if result_value:
             #    predictions, longitude, context, in_depth, piste_solution = result_value
             
+
             #try:
                 
                 #prediction_instance = Prediction(incident_id=incident_id, piste_solution=piste_solution, impact_potentiel=in_depth,

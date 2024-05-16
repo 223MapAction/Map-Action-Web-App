@@ -12,10 +12,13 @@ class UserSerializer(ModelSerializer):
         exclude = (
             'user_permissions', 'is_superuser', 'is_active', 'is_staff')
 
-    def create(self, validated_data, **extra_fields):
+    def create(self, validated_data):
+        zones = validated_data.pop('zones', None)
         user = self.Meta.model(**validated_data)
         user.set_password(validated_data['password'])
         user.save()
+        if zones:
+            user.zones.set(zones)
         return user
 
 

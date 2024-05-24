@@ -11,7 +11,7 @@ def prediction_task(image_name, longitude, latitude, incident_id):
     sensitive_structures = OverpassCall(latitude, longitude)
     print(sensitive_structures)
     
-    fastapi_url = "http://51.159.141.113:8001/api1/image/predict/"
+    fastapi_url = "http://51.159.141.113:80011/api1/image/predict/"
     
     payload = {"image_name": image_name, "sensitive_structures": sensitive_structures, "incident_id": str(incident_id)}
     longitude = longitude
@@ -38,10 +38,10 @@ def OverpassCall(lat, lon):
     query = f"""
         [out:json];
         (
-            node["amenity"="school"](around:50, {lat}, {lon});
-            node["amenity"="river"](around:50, {lat}, {lon});
-            node["amenity"="marigot"](around:50, {lat}, {lon});
-            node["amenity"="clinic"](around:50, {lat}, {lon});
+            node["amenity"="school"](around:500, {lat}, {lon});
+            node["amenity"="river"](around:500, {lat}, {lon});
+            node["amenity"="marigot"](around:500, {lat}, {lon});
+            node["amenity"="clinic"](around:500, {lat}, {lon});
         );
         out body;
         >;

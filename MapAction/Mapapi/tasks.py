@@ -34,6 +34,8 @@ def prediction_task(image_name, longitude, latitude, incident_id):
 
 @shared_task
 def OverpassCall(lat, lon):
+    lat = lat
+    lon = lon
     
     query = f"""
         [out:json];
@@ -57,5 +59,8 @@ def OverpassCall(lat, lon):
                 
         }
         results_list.append(result_item)
+        print(result_item)
+    
+    print(result_item)
             
     return results_list

@@ -9,11 +9,18 @@ import overpy
 def prediction_task(image_name, longitude, latitude, incident_id):
     
     sensitive_structures = OverpassCall(latitude, longitude)
-    print(sensitive_structures)
+    
+    sensitive_structures_names = []
+
+    for entry in sensitive_structures:
+        # Extract the value associated with the key 'name' and add it to the names list
+        sensitive_structures_names.append(entry['name'])
+
+    print(sensitive_structures_names)
     
     fastapi_url = "http://51.159.141.113:8001/api1/image/predict"
     
-    payload = {"image_name": image_name, "sensitive_structures": sensitive_structures, "incident_id": str(incident_id)}
+    payload = {"image_name": image_name, "sensitive_structures": sensitive_structures_names, "incident_id": str(incident_id)}
     longitude = longitude
     
     response = requests.post(fastapi_url, json=payload)

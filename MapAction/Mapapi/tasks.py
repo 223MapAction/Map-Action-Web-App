@@ -39,7 +39,7 @@ def prediction_task(image_name, longitude, latitude, incident_id):
     return prediction, longitude, context, in_depth, piste_solution
 
 
-@shared_task
+
 def OverpassCall(lat, lon):
     
     query = f"""

@@ -5,6 +5,36 @@ import json
 import requests
 import overpy
 
+
+def OverpassCall(lat, lon):
+    
+    query = f"""
+        [out:json];
+        (
+            node["amenity"="school"](around:500, {lat}, {lon});
+            node["amenity"="river"](around:500, {lat}, {lon});
+            node["amenity"="marigot"](around:500, {lat}, {lon});
+            node["amenity"="clinic"](around:500, {lat}, {lon});
+        );
+        out body;
+        >;
+        out skel qt;
+        """
+    api = overpy.Overpass()
+    result = api.query(query)
+    results_list = []
+    for node in result.nodes:
+        result_item = {
+            "amenity": node.tags.get("amenity", ""),
+            "name": node.tags.get("name", ""),
+                
+        }
+        results_list.append(result_item)
+    
+            
+    return results_list
+
+
 @shared_task
 def prediction_task(image_name, longitude, latitude, incident_id):
     
@@ -39,31 +69,5 @@ def prediction_task(image_name, longitude, latitude, incident_id):
     return prediction, longitude, context, in_depth, piste_solution
 
 
-@shared_task
-def OverpassCall(lat, lon):
-    
-    query = f"""
-        [out:json];
-        (
-            node["amenity"="school"](around:500, {lat}, {lon});
-            node["amenity"="river"](around:500, {lat}, {lon});
-            node["amenity"="marigot"](around:500, {lat}, {lon});
-            node["amenity"="clinic"](around:500, {lat}, {lon});
-        );
-        out body;
-        >;
-        out skel qt;
-        """
-    api = overpy.Overpass()
-    result = api.query(query)
-    results_list = []
-    for node in result.nodes:
-        result_item = {
-            "amenity": node.tags.get("amenity", ""),
-            "name": node.tags.get("name", ""),
-                
-        }
-        results_list.append(result_item)
-    
-            
-    return results_list
+
+

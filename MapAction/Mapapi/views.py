@@ -44,7 +44,11 @@ from rest_framework.exceptions import NotFound, ValidationError
 import pyotp
 import os
 from twilio.rest import Client
+from .Send_mails import send_email
+import time
+import logging
 
+logger = logging.getLogger(__name__)
 
 
 
@@ -227,82 +231,40 @@ class UserAPIListView(generics.CreateAPIView):
         return paginator.get_paginated_response(serializer.data)
 
     def post(self, request, format=None):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            """
-                désérialisation des données de la requête et les enregistrer dans la base de données.
+        start_time = time.time()
+        data = request.data.copy()
+        zones = data.pop('zones', None)
 
-                deserialization of the query data and save it to the database.
-            """
-            if 'user_type' in request.data and request.data['user_type'] == "admin":
-                subject, from_email, to = '[MAP ACTION] - Votre compte Admin', settings.EMAIL_HOST_USER, request.data[
-                    "email"]
-                html_content = render_to_string('mail_add_admin.html', {'email': request.data["email"],
-                                                                        'password': request.data[
-                                                                            "password"]})  # render with dynamic value#
-                text_content = strip_tags(html_content)  # Strip the html tag. So people can see the pure text at least.
-                msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-                """
-                envoie des e-mails aux utilisateurs en fonction du type de compte  créé.
-                
-                send emails to users based on the type of account  created.
-                """
-            if 'user_type' in request.data and request.data['user_type'] == "elu":
-                subject, from_email, to = '[MAP ACTION] - Votre compte ELU', settings.EMAIL_HOST_USER, request.data[
-                    "email"]
-                html_content = render_to_string('mail_add_account.html',
-                                                {'email': request.data["email"], 'password': request.data["password"],
-                                                 'usertype': 'ELU'})  # render with dynamic value#
-                text_content = strip_tags(html_content)  # Strip the html tag. So people can see the pure text at least.
-                msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-            if 'user_type' in request.data and request.data['user_type'] == "visitor":
-                subject, from_email, to = '[MAP ACTION] - Votre compte VISITEUR', settings.EMAIL_HOST_USER, \
-                    request.data["email"]
-                html_content = render_to_string('mail_add_account.html',
-                                                {'email': request.data["email"], 'password': request.data["password"],
-                                                 'usertype': 'VISITEUR'})  # render with dynamic value#
-                text_content = strip_tags(html_content)  # Strip the html tag. So people can see the pure text at least.
-                msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-            if 'user_type' in request.data and request.data['user_type'] == "citizen":
-                subject, from_email, to = '[MAP ACTION] - Votre compte CITOYEN', settings.EMAIL_HOST_USER, request.data[
-                    "email"]
-                html_content = render_to_string('mail_add_account.html',
-                                                {'email': request.data["email"], 'password': request.data["password"],
-                                                 'usertype': 'CITOYEN'})  # render with dynamic value#
-                text_content = strip_tags(html_content)  # Strip the html tag. So people can see the pure text at least.
-                msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-            if 'user_type' in request.data and request.data['user_type'] == "reporter":
-                subject, from_email, to = '[MAP ACTION] - Votre compte REPORTEUR', settings.EMAIL_HOST_USER, \
-                    request.data["email"]
-                html_content = render_to_string('mail_add_account.html',
-                                                {'email': request.data["email"], 'password': request.data["password"],
-                                                 'usertype': 'REPORTEUR'})  # render with dynamic value#
-                text_content = strip_tags(html_content)  # Strip the html tag. So people can see the pure text at least.
-                msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-            if 'user_type' in request.data and request.data['user_type'] == "business":
-                subject, from_email, to = '[MAP ACTION] - Votre compte BUSINESS', settings.EMAIL_HOST_USER, \
-                    request.data["email"]
-                html_content = render_to_string('mail_add_account.html',
-                                                {'email': request.data["email"], 'password': request.data["password"],
-                                                 'usertype': 'BUSINESS'})  # render with dynamic value#
-                text_content = strip_tags(html_content)  # Strip the html tag. So people can see the pure text at least.
-                msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-            return Response(serializer.data,
-                            status=201)  # returns a response to the client with the data of the newly created user
-            # and a code status of 201
+        logger.info("Starting user creation process")
+        serializer = UserSerializer(data=data)
+        if serializer.is_valid():
+            user = serializer.save()
+            if zones:
+                user.zones.set(zones)
+            user_creation_time = time.time() - start_time
+            logger.info(f"User created in {user_creation_time:.2f} seconds")
+
+            user_type = request.data.get('user_type', None)
+            if user_type:
+                subject_prefix = '[MAP ACTION] - Votre compte'
+                email_template = 'mail_add_account.html'
+                usertype = user_type.upper()
+
+                if user_type == "admin":
+                    subject = f'{subject_prefix} Admin'
+                    email_template = 'mail_add_admin.html'
+                else:
+                    subject = f'{subject_prefix} {usertype}'
+
+                context = {'email': request.data["email"], 'password': request.data["password"], 'usertype': usertype}
+
+                send_email.delay(subject, email_template, context, request.data["email"])
+                logger.info("Email task queued")
+
+            total_time = time.time() - start_time
+            logger.info(f"Total processing time: {total_time:.2f} seconds")
+
+            return Response(serializer.data, status=201)
 
         return Response(serializer.errors, status=400)
 

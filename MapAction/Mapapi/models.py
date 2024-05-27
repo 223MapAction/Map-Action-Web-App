@@ -349,7 +349,11 @@ class Notification(models.Model):
     read = models.BooleanField(default=False)
 
 
+    def __str__(self):
+        return self.message
+    
 class ChatHistory(models.Model):
     session_id = models.CharField(max_length=255, db_index=True)
     question = models.TextField(db_index=True)
     answer = models.TextField(db_index=True)
+

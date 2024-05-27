@@ -416,7 +416,7 @@ class IncidentAPIListView(generics.CreateAPIView):
 
             print(incident_id)
             
-            overpass_result = OverpassCall.delay(longitude, latitude)
+            overpass_result = OverpassCall.delay(latitude, longitude)
             sensitive_structure_result = overpass_result.get()
             sensitive_structure = sensitive_structure_result
             print(sensitive_structure)

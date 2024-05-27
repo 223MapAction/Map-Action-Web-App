@@ -5,7 +5,7 @@ import json
 import requests
 import overpy
 
-
+@shared_task
 def OverpassCall(lat, lon):
     
     query = f"""
@@ -36,9 +36,7 @@ def OverpassCall(lat, lon):
 
 
 @shared_task
-def prediction_task(image_name, longitude, latitude, incident_id):
-    
-    sensitive_structures = OverpassCall(latitude, longitude)
+def prediction_task(image_name, longitude, latitude, incident_id, sensitive_structures):
     
     sensitive_structures_names = []
 

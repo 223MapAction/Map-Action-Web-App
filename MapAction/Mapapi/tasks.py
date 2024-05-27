@@ -14,7 +14,7 @@ def prediction_task(image_name, longitude, latitude, incident_id):
 
     for entry in sensitive_structures:
         # Extract the value associated with the key 'name' and add it to the names list
-        sensitive_structures_names.append(entry['name'])
+        sensitive_structures_names.append(entry['amenity'])
 
     print(sensitive_structures_names)
     

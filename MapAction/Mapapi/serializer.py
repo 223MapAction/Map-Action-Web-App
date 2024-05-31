@@ -234,3 +234,9 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
+
+
+class ChatHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatHistory
+        fields = '__all__'

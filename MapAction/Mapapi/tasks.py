@@ -41,8 +41,14 @@ def prediction_task(image_name, longitude, latitude, incident_id, sensitive_stru
     sensitive_structures_names = []
 
     for entry in sensitive_structures:
-        # Extract the value associated with the key 'name' and add it to the names list
-        sensitive_structures_names.append(entry['amenity'])
+        if entry['amenity'] == "school":
+            sensitive_structures_names.append('ecole')
+        elif entry['amenity'] == "river":
+            sensitive_structures_names.append("cours d'eau")
+        elif entry['amenity'] == "marigot":
+            sensitive_structures_names.append('marigot')
+        elif entry['amenity'] == "clinic":
+            sensitive_structures_names.append('clinique')
 
     print(sensitive_structures_names)
     

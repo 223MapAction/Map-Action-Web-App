@@ -103,7 +103,7 @@ urlpatterns = [
     path('Search/', IncidentSearchView.as_view(), name="search"),
     path('prediction/', PredictionView.as_view(), name="predicton"),
     path('histories/', history_list, name='history_list'),
-    path('history/<int:id>', ChatHistoryViewByIncident.as_view(), name='history by id'),
+    path('history/<int:id>', ChatHistoryViewByIncident.as_view(), name='history_by_id'),
     path('histories/add/', add_history, name='add_history'),
     # Prediction
     path('prediction/<int:id>', PredictionViewByID.as_view(), name="predicton"),

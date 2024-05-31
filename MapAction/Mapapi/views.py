@@ -414,9 +414,13 @@ class IncidentAPIListView(generics.CreateAPIView):
             incident_instance = Incident.objects.get(longitude=longitude)
             incident_id = incident_instance.id
 
-            
             print(incident_id)
-            result = prediction_task.delay(image_name, longitude, latitude, incident_id)
+            
+            overpass_result = OverpassCall.delay(latitude, longitude)
+            sensitive_structure_result = overpass_result.get()
+            sensitive_structure = sensitive_structure_result
+            print(sensitive_structure)
+            result = prediction_task.delay(image_name, longitude, latitude, incident_id, sensitive_structure)
             
             #result_value = result.get()
             
@@ -2046,7 +2050,6 @@ class PredictionView(generics.ListAPIView):
     queryset = Prediction.objects.all()
     serializer_class = PredictionSerializer
 
-    
 def history_list(request):
     histories = ChatHistory.objects.all()  # Retrieve all history records
     data = {"histories": list(histories.values("session_id", "question", "answer"))}
@@ -2088,4 +2091,17 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return Notification.objects.filter(user=user)
+
+
+
+class ChatHistoryViewByIncident(generics.ListAPIView):
+    permission_classes = ()
+    serializer_class = ChatHistorySerializer
+
+    def get_queryset(self):
+        session_id = self.kwargs['id']
+        queryset = ChatHistory.objects.filter(session_id=session_id)
+        return queryset
+
+
 

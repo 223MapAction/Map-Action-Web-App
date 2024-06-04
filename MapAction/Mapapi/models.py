@@ -335,6 +335,7 @@ class Collaboration(models.Model):
     end_date = models.DateField(blank=True)
 
 class Prediction(models.Model):
+    prediction_id = models.CharField(max_length=255, blank=False, null=False)
     incident_id = models.CharField(max_length=255, blank=False, null=False)
     incident_type = models.CharField(max_length=255, blank=False, null=False)
     piste_solution = models.TextField(blank=False, null=False)

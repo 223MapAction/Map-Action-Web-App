@@ -354,3 +354,8 @@ class ChatHistory(models.Model):
     session_id = models.CharField(max_length=255, db_index=True)
     question = models.TextField(db_index=True)
     answer = models.TextField(db_index=True)
+
+class UserAction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=False)
+    action = models.CharField(max_length=255)
+    timeStamp = models.DateField(auto_now_add=True)

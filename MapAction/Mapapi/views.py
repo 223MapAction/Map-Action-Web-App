@@ -414,9 +414,13 @@ class IncidentAPIListView(generics.CreateAPIView):
             incident_instance = Incident.objects.get(longitude=longitude)
             incident_id = incident_instance.id
 
-            
             print(incident_id)
-            result = prediction_task.delay(image_name, longitude, latitude, incident_id)
+            
+            #overpass_result = OverpassCall.delay(latitude, longitude)
+            #sensitive_structure_result = overpass_result.get()
+            #sensitive_structure = sensitive_structure_result
+            #print(sensitive_structure)
+            #result = prediction_task.delay(image_name, longitude, latitude, incident_id, sensitive_structure)
             
             #result_value = result.get()
             
@@ -2054,6 +2058,7 @@ class PredictionView(generics.ListAPIView):
     serializer_class = PredictionSerializer
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 @extend_schema(
     description="Endpoint for retrieving prediction by ID",
@@ -2061,6 +2066,8 @@ class PredictionView(generics.ListAPIView):
 )   
 =======
     
+=======
+>>>>>>> a5c22825ef689c861aef421567cebdbb02a1772d
 def history_list(request):
     histories = ChatHistory.objects.all()  # Retrieve all history records
     data = {"histories": list(histories.values("session_id", "question", "answer"))}
@@ -2117,6 +2124,7 @@ class UserActionView(viewsets.ModelViewSet):
     serializer_class = UserActionSerializer
     permission_classes = [IsAuthenticated]
 
+<<<<<<< HEAD
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
@@ -2159,3 +2167,18 @@ class HandleIncidentView(APIView):
 =======
 
 >>>>>>> 94316a98ac110f9a5a417abe4911437cb03c68b6
+=======
+
+
+class ChatHistoryViewByIncident(generics.ListAPIView):
+    permission_classes = ()
+    serializer_class = ChatHistorySerializer
+
+    def get_queryset(self):
+        session_id = self.kwargs['id']
+        queryset = ChatHistory.objects.filter(session_id=session_id)
+        return queryset
+
+
+
+>>>>>>> a5c22825ef689c861aef421567cebdbb02a1772d

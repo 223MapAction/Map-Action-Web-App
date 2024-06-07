@@ -6,14 +6,55 @@ import requests
 import overpy
 
 @shared_task
-def prediction_task(image_name, longitude, latitude, incident_id):
+def OverpassCall(lat, lon):
     
-    sensitive_structures = OverpassCall(latitude, longitude)
-    print(sensitive_structures)
+    query = f"""
+        [out:json];
+        (
+            node["amenity"="school"](around:500, {lat}, {lon});
+            node["amenity"="river"](around:500, {lat}, {lon});
+            node["amenity"="marigot"](around:500, {lat}, {lon});
+            node["amenity"="clinic"](around:500, {lat}, {lon});
+        );
+        out body;
+        >;
+        out skel qt;
+        """
+    api = overpy.Overpass()
+    result = api.query(query)
+    results_list = []
+    for node in result.nodes:
+        result_item = {
+            "amenity": node.tags.get("amenity", ""),
+            "name": node.tags.get("name", ""),
+                
+        }
+        results_list.append(result_item)
     
-    fastapi_url = "http://51.159.141.113:8001/api1/image/predict/"
+            
+    return results_list
+
+
+@shared_task
+def prediction_task(image_name, longitude, latitude, incident_id, sensitive_structures):
     
-    payload = {"image_name": image_name, "sensitive_structures": sensitive_structures, "incident_id": str(incident_id)}
+    sensitive_structures_names = []
+
+    for entry in sensitive_structures:
+        if entry['amenity'] == "school":
+            sensitive_structures_names.append('ecole')
+        elif entry['amenity'] == "river":
+            sensitive_structures_names.append("cours d'eau")
+        elif entry['amenity'] == "marigot":
+            sensitive_structures_names.append('marigot')
+        elif entry['amenity'] == "clinic":
+            sensitive_structures_names.append('clinique')
+
+    print(sensitive_structures_names)
+    
+    fastapi_url = "http://51.159.141.113:8001/api1/image/predict"
+    
+    payload = {"image_name": image_name, "sensitive_structures": sensitive_structures_names, "incident_id": str(incident_id)}
     longitude = longitude
     
     response = requests.post(fastapi_url, json=payload)
@@ -32,30 +73,5 @@ def prediction_task(image_name, longitude, latitude, incident_id):
     return prediction, longitude, context, in_depth, piste_solution
 
 
-@shared_task
-def OverpassCall(lat, lon):
-    
-    query = f"""
-        [out:json];
-        (
-            node["amenity"="school"](around:50, {lat}, {lon});
-            node["amenity"="river"](around:50, {lat}, {lon});
-            node["amenity"="marigot"](around:50, {lat}, {lon});
-            node["amenity"="clinic"](around:50, {lat}, {lon});
-        );
-        out body;
-        >;
-        out skel qt;
-        """
-    api = overpy.Overpass()
-    result = api.query(query)
-    results_list = []
-    for node in result.nodes:
-        result_item = {
-            "amenity": node.tags.get("amenity", ""),
-            "name": node.tags.get("name", ""),
-                
-        }
-        results_list.append(result_item)
-            
-    return results_list
+
+

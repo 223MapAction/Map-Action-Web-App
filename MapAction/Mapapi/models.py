@@ -336,9 +336,10 @@ class Collaboration(models.Model):
 
 class Prediction(models.Model):
     incident_id = models.CharField(max_length=255, blank=False, null=False)
-    piste_solution = models.TextField()
-    impact_potentiel = models.TextField()
-    context = models.TextField()
+    incident_type = models.CharField(max_length=255, blank=False, null=False)
+    piste_solution = models.TextField(blank=False, null=False)
+    impact_potentiel = models.TextField(blank=False, null=False)
+    context = models.TextField(blank=False, null=False)
 
 
 class Notification(models.Model):
@@ -346,6 +347,7 @@ class Notification(models.Model):
     message = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.message
@@ -359,3 +361,6 @@ class UserAction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=False)
     action = models.CharField(max_length=255)
     timeStamp = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.action

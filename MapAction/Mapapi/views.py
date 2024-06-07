@@ -2053,11 +2053,30 @@ class PredictionView(generics.ListAPIView):
     queryset = Prediction.objects.all()
     serializer_class = PredictionSerializer
 
+    
+def history_list(request):
+    histories = ChatHistory.objects.all()  # Retrieve all history records
+    data = {"histories": list(histories.values("session_id", "question", "answer"))}
+    return JsonResponse(data)
 
-@extend_schema(
-    description="Endpoint for retrieving prediction by ID",
-    responses={200: PredictionSerializer()},
-)   
+@csrf_exempt  # Disable CSRF token for this view for simplicity
+def add_history(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            history = History(
+                user_id=data['session_id'],
+                question=data['question'],
+                answer=data['answer']
+            )
+            history.save()
+            return JsonResponse({"message": "History added successfully!"}, status=201)
+        except (KeyError, TypeError) as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    else:
+        return HttpResponse(status=405)  # Method Not Allowed
+
+
 class PredictionViewByID(generics.ListAPIView):
     permission_classes = ()
     serializer_class = PredictionSerializer

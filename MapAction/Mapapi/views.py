@@ -422,7 +422,7 @@ class IncidentAPIListView(generics.CreateAPIView):
             #print(sensitive_structure)
             #result = prediction_task.delay(image_name, longitude, latitude, incident_id, sensitive_structure)
             
-            #result_value = result.get()33
+            #result_value = result.get()
             
             #if result_value:
             #    predictions, longitude, context, in_depth, piste_solution = result_value

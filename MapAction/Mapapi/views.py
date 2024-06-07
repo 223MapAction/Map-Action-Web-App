@@ -414,13 +414,9 @@ class IncidentAPIListView(generics.CreateAPIView):
             incident_instance = Incident.objects.get(longitude=longitude)
             incident_id = incident_instance.id
 
-            print(incident_id)
             
-            #overpass_result = OverpassCall.delay(latitude, longitude)
-            #sensitive_structure_result = overpass_result.get()
-            #sensitive_structure = sensitive_structure_result
-            #print(sensitive_structure)
-            #result = prediction_task.delay(image_name, longitude, latitude, incident_id, sensitive_structure)
+            print(incident_id)
+            result = prediction_task.delay(image_name, longitude, latitude, incident_id)
             
             #result_value = result.get()
             
@@ -2057,41 +2053,11 @@ class PredictionView(generics.ListAPIView):
     queryset = Prediction.objects.all()
     serializer_class = PredictionSerializer
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 @extend_schema(
     description="Endpoint for retrieving prediction by ID",
     responses={200: PredictionSerializer()},
 )   
-=======
-    
-=======
->>>>>>> a5c22825ef689c861aef421567cebdbb02a1772d
-def history_list(request):
-    histories = ChatHistory.objects.all()  # Retrieve all history records
-    data = {"histories": list(histories.values("session_id", "question", "answer"))}
-    return JsonResponse(data)
-
-@csrf_exempt  # Disable CSRF token for this view for simplicity
-def add_history(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            history = History(
-                user_id=data['session_id'],
-                question=data['question'],
-                answer=data['answer']
-            )
-            history.save()
-            return JsonResponse({"message": "History added successfully!"}, status=201)
-        except (KeyError, TypeError) as e:
-            return JsonResponse({"error": str(e)}, status=400)
-    else:
-        return HttpResponse(status=405)  # Method Not Allowed
-
-
->>>>>>> 94316a98ac110f9a5a417abe4911437cb03c68b6
 class PredictionViewByID(generics.ListAPIView):
     permission_classes = ()
     serializer_class = PredictionSerializer
@@ -2113,7 +2079,6 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return Notification.objects.filter(user=user)
-<<<<<<< HEAD
     
 @extend_schema(
     description="Endpoint for retrieving user action",
@@ -2124,7 +2089,6 @@ class UserActionView(viewsets.ModelViewSet):
     serializer_class = UserActionSerializer
     permission_classes = [IsAuthenticated]
 
-<<<<<<< HEAD
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
@@ -2164,21 +2128,3 @@ class HandleIncidentView(APIView):
         UserAction.objects.create(user=user, action=action_message)
 
         return Response({"status": "success", "message": action_message}, status=status.HTTP_200_OK)
-=======
-
->>>>>>> 94316a98ac110f9a5a417abe4911437cb03c68b6
-=======
-
-
-class ChatHistoryViewByIncident(generics.ListAPIView):
-    permission_classes = ()
-    serializer_class = ChatHistorySerializer
-
-    def get_queryset(self):
-        session_id = self.kwargs['id']
-        queryset = ChatHistory.objects.filter(session_id=session_id)
-        return queryset
-
-
-
->>>>>>> a5c22825ef689c861aef421567cebdbb02a1772d

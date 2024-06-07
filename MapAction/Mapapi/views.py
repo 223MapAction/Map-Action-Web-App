@@ -2105,3 +2105,51 @@ class ChatHistoryViewByIncident(generics.ListAPIView):
 
 
 
+@extend_schema(
+    description="Endpoint for retrieving user action",
+    responses={200: UserActionSerializer()},
+)
+class UserActionView(viewsets.ModelViewSet):
+    queryset = UserAction.objects.all()
+    serializer_class = UserActionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+@extend_schema(
+    description="Endpoint to change incident statut",
+    responses={200: UserActionSerializer()},
+)
+class HandleIncidentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, incident_id, format=None):
+        try:
+            incident = Incident.objects.get(id=incident_id)
+        except Incident.DoesNotExist:
+            return Response({"error": "Incident not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        action = request.data.get("action")
+
+        if action not in ["taken_into_account", "resolved"]:
+            return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+
+        if action == "taken_into_account":
+            incident.status = "taken_into_account"
+            action_message = f"took incident {incident_id} into account"
+        elif action == "resolved":
+            incident.status = "resolved"
+            action_message = f"resolved incident {incident_id}"
+
+        incident.save()
+
+        UserAction.objects.create(user=user, action=action_message)
+
+        return Response({"status": "success", "message": action_message}, status=status.HTTP_200_OK)

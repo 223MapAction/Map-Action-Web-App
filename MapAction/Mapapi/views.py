@@ -422,7 +422,7 @@ class IncidentAPIListView(generics.CreateAPIView):
             #print(sensitive_structure)
             #result = prediction_task.delay(image_name, longitude, latitude, incident_id, sensitive_structure)
             
-            #result_value = result.get()
+            #result_value = result.get()33
             
             #if result_value:
             #    predictions, longitude, context, in_depth, piste_solution = result_value
@@ -2060,7 +2060,7 @@ def add_history(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            history = History(
+            history = ChatHistory(
                 user_id=data['session_id'],
                 question=data['question'],
                 answer=data['answer']
@@ -2078,9 +2078,10 @@ class PredictionViewByID(generics.ListAPIView):
     serializer_class = PredictionSerializer
 
     def get_queryset(self):
-        incident_id = self.kwargs['id']
-        queryset = Prediction.objects.filter(incident_id=incident_id)
+        prediction_id = self.kwargs['id']
+        queryset = Prediction.objects.filter(prediction_id=prediction_id)
         return queryset
+
 
 
 class NotificationViewSet(viewsets.ModelViewSet):

@@ -240,8 +240,3 @@ class ChatHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatHistory
         fields = '__all__'
-
-class UserActionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserAction
-        fields = '__all__'

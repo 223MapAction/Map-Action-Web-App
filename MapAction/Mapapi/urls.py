@@ -5,23 +5,41 @@ from django.contrib.auth.views import (
     PasswordChangeView, PasswordChangeDoneView,
     PasswordResetView,PasswordResetDoneView, PasswordResetConfirmView,PasswordResetCompleteView,
 )
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
 urlpatterns = [
+    # URL PATTERNS for the documentation
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('accounts/', include('allauth.urls')),
+    # for token
+    path('login/', TokenObtainPairView.as_view(), name='login'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('verify-token/', TokenVerifyView.as_view(), name='token_verify'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('get_csrf_token/', get_csrf_token, name="get_csrf_token"),
-    path('login/', login),
+    path("gettoken_bymail/", GetTokenByMailView.as_view(), name="get_token_by_mail"),
+    # path('login/', login),
     path('register/', UserRegisterView, name='register'),
-    path('user/<int:id>/', UserAPIView, name='user'),
+    path('user/<int:id>/', user_api_view, name='user'),
     path('user/', UserAPIListView.as_view(), name='user_list'),
     path('user_retrieve/', UserRetrieveView.as_view(), name='user_retrieve'),
     # URL for views incidents
     path('incidentByZone/<int:zone>/', IncidentByZoneAPIView.as_view(), name='incidentZone'),
-    path('incident/<int:id>', IncidentAPIView.as_view(), name='incidentZone'),
-    path('incident/', IncidentAPIListView.as_view(), name='incidentZone'),
+    path('incident/<int:id>', IncidentAPIView.as_view(), name='incident_rud'),
+    path('incident/', IncidentAPIListView.as_view(), name='incident'),
     path('incidentResolved/', IncidentResolvedAPIListView.as_view(), name='incidentResolved'),
     path('incidentNotResolved/', IncidentNotResolvedAPIListView.as_view(), name='incidentNotResolved'),
     path('incidentByMonth/', IncidentByMonthAPIListView.as_view(), name='incidentByMonth'),
+    # path('incidentByMonths/', IncidentByMonthAPIList.as_view(), name='incidentByMonth'),
     path('incidentByMonth_zone/<zone>', IncidentByMonthByZoneAPIView.as_view(), name='incidentByMonth_zone'),
     path('IncidentOnWeek/', IncidentOnWeekAPIListView.as_view(), name='IncidentOnWeek'),
     path('IncidentOnWeek_zone/<zone>', IncidentByWeekByZoneAPIView.as_view(), name='IncidentOnWeek_zone'),
@@ -40,13 +58,13 @@ urlpatterns = [
     path('rapport_user/<int:id>', RapportByUserAPIView.as_view(), name='rapport_user'),
     path('rapport_zone/', RapportOnZoneAPIView.as_view(), name='rapport_zone'),
     # URL for views participate
-    path('participate/<int:id>', ParticipateAPIView.as_view(), name='community'),
-    path('participate/', ParticipateAPIListView.as_view(), name='community'),
+    path('participate/<int:id>', ParticipateAPIView.as_view(), name='participate_rud'),
+    path('participate/', ParticipateAPIListView.as_view(), name='participate'),
     # URL for views Elu
-    path('elu/<int:id>', EluAPIListView.as_view(), name='community'),
-    path('elu/', EluToZoneAPIListView.as_view(), name='community'),
+    path('elu/<int:id>', EluAPIListView.as_view(), name='elu_rud'),
+    path('elu/', EluToZoneAPIListView.as_view(), name='elu_zone'),
     # URL for views citizen
-    path('citizen/<int:id>', CitizenAPIListView.as_view(), name='community'),
+    path('citizen/', CitizenAPIListView.as_view(), name='citizen'),
     # URL for views zone
     path('zone/<int:id>', ZoneAPIView.as_view(), name='zone'),
     path('zone/', ZoneAPIListView.as_view(), name='zone_list'),
@@ -75,4 +93,21 @@ urlpatterns = [
     path('password_reset/', PasswordResetView.as_view(), name='passwordReset'),
     path('change_password/', ChangePasswordView.as_view(), name='change_password'),
     path('updatePoint/', UpdatePointAPIListView.as_view(), name='updatePoint'),
+    # Overpass URL
+    path('overpass/', OverpassApiIntegration.as_view(), name="overpassapi"),
+    # OTP URL
+    path('verify_otp/', PhoneOTPView.as_view(), name="verify_otp"),
+    # Collaboration URL
+    path('collaboration/', CollaborationView.as_view(), name="collaboration"),
+    # Search Incident
+    path('Search/', IncidentSearchView.as_view(), name="search"),
+    path('prediction/', PredictionView.as_view(), name="predicton"),
+    path('histories/', history_list, name='history_list'),
+    path('history/<int:id>', ChatHistoryViewByIncident.as_view(), name='history_by_id'),
+    path('histories/add/', add_history, name='add_history'),
+    # Prediction
+    path('prediction/<int:id>', PredictionViewByID.as_view(), name="predicton"),
+    # Notification
+    path('notifications/', NotificationViewSet.as_view({'get': 'list'}), name="notification")
+
 ]

@@ -2,6 +2,7 @@ import os.path
 import os
 import sys
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,17 +12,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = 'django-insecure-4k+g*9g=6h&_8@s05ps!f)n!ivs4=yujv+rx(obnku=eyz3&jb'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS"),'localhost', '127.0.0.1', '192.168.0.2', '192.168.1.26']
+
+ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS"),'localhost', '127.0.0.1', '192.168.0.2', '192.168.1.26','0.0.0.0', '192.168.0.5','51.159.141.113']
+
+
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.apple',
     # 'allauth.socialaccount.providers.linkedin',
     # 'allauth.socialaccount.providers.twitter_oauth2',
+    'drf_spectacular',
 
 ]
 
@@ -56,6 +62,59 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=90),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": False,
+    "SIGNING_KEY": 'django-insecure-4k+g*9g=6h&_8@s05ps!f)n!ivs4=yujv+rx(obnku=eyz3&jb',
+    # "VERIFYING_KEY": "",
+    # "AUDIENCE": None,
+    # "ISSUER": None,
+    # "JSON_ENCODER": None,
+    # "JWK_URL": None,
+    # "LEEWAY": 0,
+
+    # "AUTH_HEADER_TYPES": ("Bearer",),
+    # "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    # "USER_ID_FIELD": "id",
+    # "USER_ID_CLAIM": "user_id",
+    # "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+
+    # "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    # "TOKEN_TYPE_CLAIM": "token_type",
+    # "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+
+    "JTI_CLAIM": "jti",
+
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+
+    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
+    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
+    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
+    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Map Action API',
+    'DESCRIPTION': 'This comprehensive document serves as the official guide to understanding and utilizing the Map Action API.'
+     'Within these pages, developers will find detailed information, including endpoint descriptions, parameter specifications, response formats, authentication requirements, and usage examples.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -67,7 +126,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-
+    'django_http_exceptions.middleware.ExceptionHandlerMiddleware',
+    'django_http_exceptions.middleware.ThreadLocalRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -88,7 +148,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+#WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = 'backend.asgi.application'
 #ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 # ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
@@ -229,6 +290,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -256,8 +318,46 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:80",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://139.144.63.238"
+    "http://139.144.63.238",
+    "http://192.168.0.3",
+    "http://192.168.0.3:8000",
+    "http://192.168.1.26"
+
 ]
+
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://redis-server:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis-server:6379/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+# Django Q Configuration
+Q_CLUSTER = {
+    'name': 'backend',
+    'workers': 8,
+    'recycle': 500,
+    'timeout': 60,
+    'compress': True,
+    'save_limit': 250,
+    'queue_limit': 500,
+    'cpu_affinity': 1,
+    'label': 'Django Q',
+    'redis': {
+        'host': 'redis-server',
+        'port': 6379,
+        'db': 0,
+        'password': None,
+        'socket_timeout': None,
+        'charset': 'utf-8',
+        'errors': 'strict',
+        'unix_socket_path': None
+    }
+}
 
 
 AUTH_USER_MODEL = 'Mapapi.User'

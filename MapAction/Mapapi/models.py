@@ -143,7 +143,6 @@ class Incident(models.Model):
                              null=True)
     zone = models.CharField(max_length=250, blank=False,
                             null=False)
-    prediction = models.TextField(max_length=250, blank=True, null=True)
     description = models.TextField(max_length=500, blank=True, null=True)
     photo = models.ImageField(upload_to='uploads/',null=True, blank=True)
     video = models.FileField(upload_to='uploads/',blank=True, null=True)
@@ -322,4 +321,47 @@ class ImageBackground(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+# verification code otp
+class PhoneOTP(models.Model):
+    phone_number = models.CharField(max_length=15)
+    otp_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
 
+# Collaboration table
+class Collaboration(models.Model):
+    incident = models.ForeignKey('Incident', blank=False, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=False, null=False, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateField(blank=True)
+
+class Prediction(models.Model):
+    prediction_id = models.CharField(max_length=255, blank=False, null=False)
+    incident_id = models.CharField(max_length=255, blank=False, null=False)
+    incident_type = models.CharField(max_length=255, blank=False, null=False)
+    piste_solution = models.TextField(blank=False, null=False)
+    impact_potentiel = models.TextField(blank=False, null=False)
+    context = models.TextField(blank=False, null=False)
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return self.message
+    
+class ChatHistory(models.Model):
+    session_id = models.CharField(max_length=255, db_index=True)
+    question = models.TextField(db_index=True)
+    answer = models.TextField(db_index=True)
+
+class UserAction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=False)
+    action = models.CharField(max_length=255)
+    timeStamp = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.action

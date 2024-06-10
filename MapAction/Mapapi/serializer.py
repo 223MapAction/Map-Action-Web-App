@@ -12,10 +12,13 @@ class UserSerializer(ModelSerializer):
         exclude = (
             'user_permissions', 'is_superuser', 'is_active', 'is_staff')
 
-    def create(self, validated_data, **extra_fields):
+    def create(self, validated_data):
+        zones = validated_data.pop('zones', None)
         user = self.Meta.model(**validated_data)
         user.set_password(validated_data['password'])
         user.save()
+        if zones:
+            user.zones.set(zones)
         return user
 
 
@@ -43,7 +46,7 @@ class UserEluSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = (
-            'user_permissions', 'groups', 'is_superuser', 'is_active', 'is_staff', 'password')
+            'user_permissions', 'is_superuser', 'is_active', 'is_staff', 'password')
 
     def create(self, validated_data, **extra_fields):
         user = self.Meta.model(**validated_data)
@@ -198,10 +201,47 @@ class ImageBackgroundSerializer(ModelSerializer):
 
 
 class EluToZoneSerializer(serializers.Serializer):
-    model = User
+    elu = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(user_type='elu'))
+    zone = serializers.PrimaryKeyRelatedField(queryset=Zone.objects.all())
 
-    """
-    Serializer for elu to zone endpoint.
-    """
-    zone = serializers.IntegerField(required=True)
-    elu = serializers.IntegerField(required=True)
+    def create(self, validated_data):
+        elu_id = validated_data.pop('elu')
+        zone_id = validated_data.pop('zone')
+        elu = User.objects.get(id=elu_id)
+        zone = Zone.objects.get(id=zone_id)
+        elu.zones.add(zone)
+        return {
+            'elu': elu,  
+            'zone': zone
+        }
+
+class PhoneOTPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PhoneOTP
+        fields = ['phone_number']
+
+class CollaborationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collaboration
+        fields = '__all__'
+
+class PredictionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Prediction
+        fields = '__all__'
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'
+
+
+class ChatHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatHistory
+        fields = '__all__'
+
+class UserActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAction
+        fields = '__all__'

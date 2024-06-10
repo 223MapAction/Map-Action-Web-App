@@ -2031,7 +2031,11 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
+@extend_schema(
 
+        description="Endpoint for search incidents",
+        responses={200: IncidentSerializer(many=True)},
+)
 class IncidentSearchView(generics.ListAPIView):
     def get(self, request):
         search_term = request.query_params.get('search_term')
@@ -2044,7 +2048,11 @@ class IncidentSearchView(generics.ListAPIView):
         )
         serializer = IncidentSerializer(results, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+@extend_schema(
+    description="Endpoint for retrieving all predictions",
+    responses={200: PredictionSerializer(many=True)},
+) 
 class PredictionView(generics.ListAPIView):
     permission_classes = ()
     queryset = Prediction.objects.all()
@@ -2120,18 +2128,38 @@ class UserActionView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+@extend_schema(
+    description="Endpoint to change incident statut",
+    responses={200: UserActionSerializer()},
+)
 
+class HandleIncidentView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    
+def post(self, request, incident_id, format=None):
+        try:
+            incident = Incident.objects.get(id=incident_id)
+        except Incident.DoesNotExist:
+            return Response({"error": "Incident not found"}, status=status.HTTP_404_NOT_FOUND)
 
-class ChatHistoryViewByIncident(generics.ListAPIView):
-    permission_classes = ()
-    serializer_class = ChatHistorySerializer
+        action = request.data.get("action")
 
-    def get_queryset(self):
-        session_id = self.kwargs['id']
-        queryset = ChatHistory.objects.filter(session_id=session_id)
-        return queryset
+        if action not in ["taken_into_account", "resolved"]:
+            return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
 
+        user = request.user
 
+        if action == "taken_into_account":
+            incident.status = "taken_into_account"
+            action_message = f"took incident {incident_id} into account"
+        elif action == "resolved":
+            incident.status = "resolved"
+            action_message = f"resolved incident {incident_id}"
+
+        incident.save()
+
+        UserAction.objects.create(user=user, action=action_message)
 
 
         return Response({"status": "success", "message": action_message}, status=status.HTTP_200_OK)

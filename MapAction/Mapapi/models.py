@@ -358,10 +358,3 @@ class ChatHistory(models.Model):
     question = models.TextField(db_index=True)
     answer = models.TextField(db_index=True)
 
-class UserAction(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=False)
-    action = models.CharField(max_length=255)
-    timeStamp = models.DateField(auto_now_add=True)
-
-    def __str__(self):
-        return self.action

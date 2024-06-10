@@ -2050,6 +2050,14 @@ class PredictionView(generics.ListAPIView):
     queryset = Prediction.objects.all()
     serializer_class = PredictionSerializer
 
+
+
+@extend_schema(
+    description="Endpoint for retrieving prediction by ID",
+    responses={200: PredictionSerializer()},
+)   
+
+
 def history_list(request):
     histories = ChatHistory.objects.all()  # Retrieve all history records
     data = {"histories": list(histories.values("session_id", "question", "answer"))}
@@ -2082,7 +2090,10 @@ class PredictionViewByID(generics.ListAPIView):
         queryset = Prediction.objects.filter(prediction_id=prediction_id)
         return queryset
 
-
+@extend_schema(
+    description="Endpoint for filtering notifications by user ",
+    responses={200: NotificationSerializer()},
+)
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
@@ -2092,6 +2103,22 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return Notification.objects.filter(user=user)
+
+    
+@extend_schema(
+    description="Endpoint for retrieving user action",
+    responses={200: UserActionSerializer()},
+)
+class UserActionView(viewsets.ModelViewSet):
+    queryset = UserAction.objects.all()
+    serializer_class = UserActionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 
@@ -2105,4 +2132,18 @@ class ChatHistoryViewByIncident(generics.ListAPIView):
         return queryset
 
 
+
+
+        return Response({"status": "success", "message": action_message}, status=status.HTTP_200_OK)
+
+
+
+class ChatHistoryViewByIncident(generics.ListAPIView):
+    permission_classes = ()
+    serializer_class = ChatHistorySerializer
+
+    def get_queryset(self):
+        session_id = self.kwargs['id']
+        queryset = ChatHistory.objects.filter(session_id=session_id)
+        return queryset
 

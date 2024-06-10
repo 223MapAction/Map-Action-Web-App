@@ -92,6 +92,7 @@ services:
     networks:
       micro-services-network:
         ipv4_address: 192.168.0.5
+    restart: on-failure
   
 
   redis:

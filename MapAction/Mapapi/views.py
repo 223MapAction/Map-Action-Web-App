@@ -2057,17 +2057,12 @@ class PredictionView(generics.ListAPIView):
     queryset = Prediction.objects.all()
     serializer_class = PredictionSerializer
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 @extend_schema(
     description="Endpoint for retrieving prediction by ID",
     responses={200: PredictionSerializer()},
 )   
-=======
-    
-=======
->>>>>>> a5c22825ef689c861aef421567cebdbb02a1772d
+
 def history_list(request):
     histories = ChatHistory.objects.all()  # Retrieve all history records
     data = {"histories": list(histories.values("session_id", "question", "answer"))}
@@ -2078,7 +2073,7 @@ def add_history(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            history = History(
+            history = ChatHistory(
                 user_id=data['session_id'],
                 question=data['question'],
                 answer=data['answer']
@@ -2091,20 +2086,21 @@ def add_history(request):
         return HttpResponse(status=405)  # Method Not Allowed
 
 
->>>>>>> 94316a98ac110f9a5a417abe4911437cb03c68b6
 class PredictionViewByID(generics.ListAPIView):
     permission_classes = ()
     serializer_class = PredictionSerializer
 
     def get_queryset(self):
-        incident_id = self.kwargs['id']
-        queryset = Prediction.objects.filter(incident_id=incident_id)
+        prediction_id = self.kwargs['id']
+        queryset = Prediction.objects.filter(prediction_id=prediction_id)
         return queryset
+
 
 @extend_schema(
     description="Endpoint for filtering notifications by user ",
     responses={200: NotificationSerializer()},
 )
+
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
@@ -2113,7 +2109,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return Notification.objects.filter(user=user)
-<<<<<<< HEAD
+
     
 @extend_schema(
     description="Endpoint for retrieving user action",
@@ -2124,7 +2120,6 @@ class UserActionView(viewsets.ModelViewSet):
     serializer_class = UserActionSerializer
     permission_classes = [IsAuthenticated]
 
-<<<<<<< HEAD
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
@@ -2164,10 +2159,7 @@ class HandleIncidentView(APIView):
         UserAction.objects.create(user=user, action=action_message)
 
         return Response({"status": "success", "message": action_message}, status=status.HTTP_200_OK)
-=======
 
->>>>>>> 94316a98ac110f9a5a417abe4911437cb03c68b6
-=======
 
 
 class ChatHistoryViewByIncident(generics.ListAPIView):
@@ -2179,6 +2171,3 @@ class ChatHistoryViewByIncident(generics.ListAPIView):
         queryset = ChatHistory.objects.filter(session_id=session_id)
         return queryset
 
-
-
->>>>>>> a5c22825ef689c861aef421567cebdbb02a1772d

@@ -245,10 +245,3 @@ class UserActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAction
         fields = '__all__'
-
-
-
-class UserActionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserAction
-        fields = '__all__'

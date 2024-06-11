@@ -9,7 +9,8 @@ services:
     ports:
       - "8000:8000"  # Adjust the port as needed
     volumes:
-      - ~/test-dir:/app  
+      #- .:/app
+      - /app
     env_file:
       #- ./.env/.dev.env
        - ~/.dev.env

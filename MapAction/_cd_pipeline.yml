@@ -24,6 +24,7 @@ services:
       build:
         context: .
         dockerfile: ./services/api/Dockerfile.api
+      tty: true
       command: >
             sh -c "python3 manage.py wait_for_db &&
                   python3 manage.py makemigrations &&
@@ -89,6 +90,8 @@ services:
       - 80:80
     volumes:
       - ./services/nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - api-server
     networks:
       micro-services-network:
         ipv4_address: 192.168.0.5

@@ -2020,7 +2020,17 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
         try:
             serializer = CollaborationSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+            colaboration = serializer.save()
+
+            incident = colaboration.incident
+            user = incident.taken_by
+            if user:
+                Notification.objects.create(
+                    user=user,
+                    message=f"You have a new collaboration request for incident {incident.id}",
+                    colaboration=colaboration
+                )
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError as e:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -2060,7 +2070,7 @@ def add_history(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            history = History(
+            history = ChatHistory(
                 user_id=data['session_id'],
                 question=data['question'],
                 answer=data['answer']
@@ -2122,7 +2132,7 @@ class UserActionView(viewsets.ModelViewSet):
 
 
 @extend_schema(
-    description="Endpoint to change incident statut",
+    description="Endpoint to change incident status",
     responses={200: UserActionSerializer()},
 )
 class HandleIncidentView(APIView):
@@ -2141,15 +2151,69 @@ class HandleIncidentView(APIView):
 
         user = request.user
 
+        if action == "taken_into_account" and incident.etat != "declared":
+            return Response({"error": "Incident already taken into account or resolved"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if action == "resolved" and incident.etat != "taken_into_account":
+            return Response({"error": "Incident must be taken into account before being resolved"}, status=status.HTTP_400_BAD_REQUEST)
+
         if action == "taken_into_account":
-            incident.status = "taken_into_account"
+            incident.etat = "taken_into_account"
+            incident.taken_by = user
             action_message = f"took incident {incident_id} into account"
         elif action == "resolved":
-            incident.status = "resolved"
+            incident.etat = "resolved"
             action_message = f"resolved incident {incident_id}"
 
         incident.save()
 
-        UserAction.objects.create(user=user, action=action_message)
+        user_action = UserAction.objects.create(user=user, action=action_message)
+        user_data = UserSerializer(user).data
+        action_data = UserActionSerializer(user_action).data 
+        return Response({
+            "status": "success",
+            "message": action_message,
+            "user": user_data,
+            "action": action_data
+        }, status=status.HTTP_200_OK)
 
-        return Response({"status": "success", "message": action_message}, status=status.HTTP_200_OK)
+@extend_schema(
+    description="Endpoint to get user who took incident into account",
+    responses={200: UserSerializer()},
+)
+class IncidentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, incident_id, format=None):
+        try:
+            incident = Incident.objects.get(id=incident_id)
+        except Incident.DoesNotExist:
+            return Response({"error": "Incident not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if not incident.taken_by:
+            return Response({"error": "Incident not taken into account by any user"}, status=status.HTTP_404_NOT_FOUND)
+
+        user_data = UserSerializer(incident.taken_by).data
+        return Response({
+            "status": "success",
+            "user": user_data
+        }, status=status.HTTP_200_OK)
+
+class HandleCollaborationRequestView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, collaboration_id, action, format=None):
+        try:
+            collaboration = Collaboration.objects.get(id=collaboration_id)
+        except Collaboration.DoesNotExist:
+            return Response({"error": "Collaboration not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if action not in ["accept", "reject"]:
+            return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if action == "accept":
+            return Response({"status": "Collaboration accepted"}, status=status.HTTP_200_OK)
+        elif action == "reject":
+            collaboration.delete()
+            return Response({"status": "Collaboration rejected"}, status=status.HTTP_200_OK)
+

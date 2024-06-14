@@ -163,6 +163,7 @@ class Incident(models.Model):
                             null=True)
     category_ids = models.ManyToManyField('Category', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    taken_by = models.ForeignKey(User, related_name='taken_incidents', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.zone + ' '
@@ -348,7 +349,7 @@ class Notification(models.Model):
     message = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
-
+    colaboration = models.ForeignKey(Collaboration, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.message
@@ -365,4 +366,3 @@ class UserAction(models.Model):
 
     def __str__(self):
         return self.action
-        

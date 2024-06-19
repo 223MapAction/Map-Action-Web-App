@@ -99,6 +99,7 @@ urlpatterns = [
     path('verify_otp/', PhoneOTPView.as_view(), name="verify_otp"),
     # Collaboration URL
     path('collaboration/', CollaborationView.as_view(), name="collaboration"),
+    path('collaboration/<int:collaboration_id>/<str:action>/', HandleCollaborationRequestView.as_view(), name="handle_collaboration_request"),
     # Search Incident
     path('Search/', IncidentSearchView.as_view(), name="search"),
     path('prediction/', PredictionView.as_view(), name="predicton"),
@@ -108,6 +109,10 @@ urlpatterns = [
     # Prediction
     path('prediction/<int:id>', PredictionViewByID.as_view(), name="predicton"),
     # Notification
-    path('notifications/', NotificationViewSet.as_view({'get': 'list'}), name="notification")
+    path('notifications/', NotificationViewSet.as_view({'get': 'list'}), name="notification"),
+    path('hadleIncident/<int:incident_id>', HandleIncidentView.as_view(), name="handle"),
+    path('user_action/', UserActionView.as_view({'get': 'list'}), name="user_action"),
+    path('incidentDetail/<int:incident_id>', IncidentUserView.as_view(), name="incident_detail"),
+
 
 ]

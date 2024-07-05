@@ -11,7 +11,6 @@ Map-Action-Web-App is a comprehensive solution that combines a robust API. This 
 
 ## Features
 - **API**: Provides endpoints for managing and retrieving data on environment-related incidents.
-- **Web Application**: Offers a user-friendly interface for interacting with and visualizing the incident data.
 - **Asynchronous Task Processing**: Uses Celery and Redis to handle background tasks efficiently.
 - **Database Management**: Utilizes Postgres for robust data storage and querying capabilities.
 

@@ -14,8 +14,7 @@ Map-Action-Web-App is a comprehensive solution that combines a robust API. This 
 - **Web Application**: Offers a user-friendly interface for interacting with and visualizing the incident data.
 - **Asynchronous Task Processing**: Uses Celery and Redis to handle background tasks efficiently.
 - **Database Management**: Utilizes Postgres for robust data storage and querying capabilities.
-- 
-- 
+
 ![image](https://github.com/223MapAction/Map-Action-Web-App/assets/64170643/08e7d056-c42a-4ae2-b95a-d70ae4bfe5c1)
 
 

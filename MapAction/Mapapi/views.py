@@ -2107,6 +2107,14 @@ class PredictionViewByID(generics.ListAPIView):
         prediction_id = self.kwargs['id']
         queryset = Prediction.objects.filter(prediction_id=prediction_id)
         return queryset
+class PredictionViewByIncidentID(generics.ListAPIView):
+    permission_classes = ()
+    serializer_class = PredictionSerializer
+
+    def get_queryset(self):
+        incident_id = self.kwargs['id']
+        queryset = Prediction.objects.filter(incident_id=incident_id)
+        return queryset
 
 @extend_schema(
     description="Endpoint for filtering notifications by user ",

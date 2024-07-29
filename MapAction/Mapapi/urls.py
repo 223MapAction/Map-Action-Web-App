@@ -108,6 +108,7 @@ urlpatterns = [
     path('histories/add/', add_history, name='add_history'),
     # Prediction
     path('prediction/<int:id>', PredictionViewByID.as_view(), name="predicton"),
+    path('prediction/<str:id>', PredictionViewByID.as_view(), name="prediction"),
     # Notification
     path('notifications/', NotificationViewSet.as_view({'get': 'list'}), name="notification"),
     path('hadleIncident/<int:incident_id>', HandleIncidentView.as_view(), name="handle"),

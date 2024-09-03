@@ -2027,7 +2027,7 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
             if user:
                 Notification.objects.create(
                     user=user,
-                    message=f"You have a new collaboration request for incident {incident.id}",
+                    message=f"Vous avez une nouvelle collaboration pour l'incident {incident.id}",
                     colaboration=colaboration
                 )
 

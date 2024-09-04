@@ -474,6 +474,41 @@ class IncidentResolvedAPIListView(generics.CreateAPIView):
         serializer = IncidentGetSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
+
+@extend_schema(
+    description="Endpoint allowing filtering retrieval incidents",
+    request=IncidentSerializer,
+    responses={200: IncidentSerializer, 404: "incident not found"},  
+)
+class IncidentFilterView(APIView):
+    def get(self, request, *args, **kwargs):
+        filter_type = request.query_params.get('filter_type')
+        custom_start = request.query_params.get('custom_start')
+        custom_end = request.query_params.get('custom_end')
+
+        incidents = Incident.objects.all()
+
+        # Filtrage par type
+        if filter_type == 'today':
+            incidents = incidents.filter(created_at__date=timezone.now().date())
+        elif filter_type == 'yesterday':
+            incidents = incidents.filter(created_at__date=timezone.now().date() - timedelta(days=1))
+        elif filter_type == 'last_7_days':
+            incidents = incidents.filter(created_at__date__gte=timezone.now().date() - timedelta(days=7))
+        elif filter_type == 'last_30_days':
+            incidents = incidents.filter(created_at__date__gte=timezone.now().date() - timedelta(days=30))
+        elif filter_type == 'this_month':
+            incidents = incidents.filter(created_at__month=timezone.now().month)
+        elif filter_type == 'last_month':
+            last_month = timezone.now().month - 1 or 12
+            incidents = incidents.filter(created_at__month=last_month)
+        elif filter_type == 'custom_range' and custom_start and custom_end:
+            incidents = incidents.filter(created_at__date__range=[custom_start, custom_end])
+
+        # Sérialisation des incidents
+        serializer = IncidentSerializer(incidents, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 @extend_schema(
     description="Endpoint allowing retrieval an incident not resolved.",
     request=IncidentSerializer,

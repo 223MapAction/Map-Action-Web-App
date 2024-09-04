@@ -39,10 +39,10 @@ urlpatterns = [
     path('incidentResolved/', IncidentResolvedAPIListView.as_view(), name='incidentResolved'),
     path('incidentNotResolved/', IncidentNotResolvedAPIListView.as_view(), name='incidentNotResolved'),
     path('incidentByMonth/', IncidentByMonthAPIListView.as_view(), name='incidentByMonth'),
-    # path('incidentByMonths/', IncidentByMonthAPIList.as_view(), name='incidentByMonth'),
     path('incidentByMonth_zone/<zone>', IncidentByMonthByZoneAPIView.as_view(), name='incidentByMonth_zone'),
     path('IncidentOnWeek/', IncidentOnWeekAPIListView.as_view(), name='IncidentOnWeek'),
     path('IncidentOnWeek_zone/<zone>', IncidentByWeekByZoneAPIView.as_view(), name='IncidentOnWeek_zone'),
+    path('incident-filter/', IncidentFilterView.as_view(), name='incident_filter'),
     # URL for views Events
     path('Event/<int:id>', EvenementAPIView.as_view(), name='event'),
     path('Event/', EvenementAPIListView.as_view(), name='event'),

@@ -2047,6 +2047,7 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
     permission_classes = ()
     queryset = Collaboration.objects.all()
     serializer_class = CollaborationSerializer
+
     @extend_schema(
         description="Endpoint for creating a collaboration",
         responses={200: "generate", 400: "Bad request"},
@@ -2065,10 +2066,16 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
                     message=f"Vous avez une nouvelle collaboration pour l'incident {incident.id}",
                     colaboration=colaboration
                 )
-
+                send_mail(
+                    subject='Nouvelle demande de collaboration',
+                    message=f'Un utilisateur souhaite collaborer sur l\'incident {incident.id}.',
+                    from_email='contact@map-action.com',
+                    recipient_list=[user.email],
+                )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError as e:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @extend_schema(
         description="Endpoint for retrieving all collaborations",
         responses={200: CollaborationSerializer(many=True)},

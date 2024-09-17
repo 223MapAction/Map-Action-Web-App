@@ -7,6 +7,6 @@ from django.utils.html import strip_tags
 def send_email(subject, template_name, context, to_email):
     html_content = render_to_string(template_name, context)
     text_content = strip_tags(html_content)
-    msg = EmailMultiAlternatives(subject, text_content, 'your_email@example.com', [to_email])
+    msg = EmailMultiAlternatives(subject, text_content, 'contact@map-action.com', [to_email])
     msg.attach_alternative(html_content, "text/html")
     msg.send()

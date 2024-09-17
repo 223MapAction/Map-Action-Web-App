@@ -28,7 +28,7 @@ import datetime
 import requests
 from django.template.loader import get_template, render_to_string
 from django.utils.html import strip_tags
-from django.core.mail import EmailMultiAlternatives, send_mail
+from django.core.mail import EmailMultiAlternatives
 import random
 import string
 
@@ -2056,22 +2056,29 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
         try:
             serializer = CollaborationSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            colaboration = serializer.save()
+            collaboration = serializer.save()
 
-            incident = colaboration.incident
+            incident = collaboration.incident
             user = incident.taken_by
             if user:
                 Notification.objects.create(
                     user=user,
                     message=f"Vous avez une nouvelle collaboration pour l'incident {incident.id}",
-                    colaboration=colaboration
+                    collaboration=collaboration
                 )
-                send_mail(
+                
+                context = {
+                    'incident_id': incident.id,
+                    'organisation': user.organisation,
+                }
+                
+                send_email.delay(
                     subject='Nouvelle demande de collaboration',
-                    message=f'Un utilisateur souhaite collaborer sur l\'incident {incident.id}.',
-                    from_email='contact@map-action.com',
-                    recipient_list=[user.email],
+                    template_name='emails/collaboration_request.html',
+                    context=context,
+                    to_email=user.email
                 )
+                
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError as e:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -2083,10 +2090,32 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
-@extend_schema(
 
-        description="Endpoint for search incidents",
-        responses={200: IncidentSerializer(many=True)},
+
+class AcceptCollaborationView(APIView):
+    permission_classes = ()
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            collaboration_id = request.data.get('collaboration_id')
+            collaboration = Collaboration.objects.get(id=collaboration_id)
+            requesting_user = collaboration.user
+            send_mail(
+                subject='Demande de collaboration acceptée',
+                message=f'Votre demande de collaboration sur l\'incident {collaboration.incident.id} a été acceptée.',
+                from_email='contact@map-action.com',
+                recipient_list=[requesting_user.email],
+            )
+
+            return Response({"message": "Collaboration acceptée"}, status=status.HTTP_200_OK)
+        except Collaboration.DoesNotExist:
+            return Response({"error": "Collaboration non trouvée"}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+@extend_schema(
+    description="Endpoint for search incidents",
+    responses={200: IncidentSerializer(many=True)},
 )
 class IncidentSearchView(generics.ListAPIView):
     def get(self, request):
@@ -2195,9 +2224,7 @@ class UserActionView(viewsets.ModelViewSet):
 
 class HandleIncidentView(APIView):
     permission_classes = [IsAuthenticated]
-    
-    
-def post(self, request, incident_id, format=None):
+    def post(self, request, incident_id, format=None):
         try:
             incident = Incident.objects.get(id=incident_id)
         except Incident.DoesNotExist:

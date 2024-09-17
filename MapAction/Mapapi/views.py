@@ -1,5 +1,4 @@
 import subprocess
-from django.core.mail import send_mail
 from django.db.models import Q
 from django.shortcuts import render, HttpResponse
 from django.core.serializers import serialize
@@ -2083,6 +2082,14 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError as e:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        description="Endpoint for retrieving all collaborations",
+        responses={200: CollaborationSerializer(many=True)},
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
 
 
 class AcceptCollaborationView(APIView):

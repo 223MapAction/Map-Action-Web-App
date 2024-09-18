@@ -2048,48 +2048,19 @@ class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
     queryset = Collaboration.objects.all()
     serializer_class = CollaborationSerializer
 
-    @extend_schema(
-        description="Endpoint for creating a collaboration",
-        responses={200: "generate", 400: "Bad request"},
-    )
     def post(self, request, *args, **kwargs):
         try:
             serializer = CollaborationSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             collaboration = serializer.save()
-
-            incident = collaboration.incident
-            user = incident.taken_by
-            if user:
-                Notification.objects.create(
-                    user=user,
-                    message=f"Vous avez une nouvelle collaboration pour l'incident {incident.id}",
-                    collaboration=collaboration
-                )
-                
-                context = {
-                    'incident_id': incident.id,
-                    'organisation': user.organisation,
-                }
-                
-                send_email.delay(
-                    subject='Nouvelle demande de collaboration',
-                    template_name='emails/collaboration_request.html',
-                    context=context,
-                    to_email=user.email
-                )
-                
+            
+            # Log the success of collaboration creation
+            logger.info(f"Collaboration created with ID: {collaboration.id}")
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError as e:
+            logger.error(f"Validation error: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @extend_schema(
-        description="Endpoint for retrieving all collaborations",
-        responses={200: CollaborationSerializer(many=True)},
-    )
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
 
 
 class AcceptCollaborationView(APIView):

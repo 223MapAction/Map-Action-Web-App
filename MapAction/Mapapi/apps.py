@@ -6,4 +6,4 @@ class MapapiConfig(AppConfig):
     name = 'Mapapi'
 
     def ready(self):
-        import Mapapi.signals
+        from . import signals

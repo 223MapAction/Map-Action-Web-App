@@ -346,8 +346,9 @@ LOGGING = {
 
 AUTH_USER_MODEL = 'Mapapi.User'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'map-action.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
+EMAIL_HOST = 'mail.map-action.com'
+EMAIL_USE_TLS = False  
+EMAIL_USE_SSL = True 
+EMAIL_PORT = 465
 EMAIL_HOST_USER = 'contact@map-action.com'
-EMAIL_HOST_PASSWORD = 'MesEquipes55'
+EMAIL_HOST_PASSWORD = 'Equipes55'

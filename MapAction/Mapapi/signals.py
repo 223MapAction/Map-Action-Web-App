@@ -20,7 +20,7 @@ def notify_organisation_on_collaboration(sender, instance, created, **kwargs):
                     'incident_id': incident.id,
                     'organisation': user.organisation,
                 }
-                send_email(
+                send_email.delay(
                     subject='Nouvelle demande de collaboration',
                     template_name='emails/collaboration_request.html',
                     context=context,

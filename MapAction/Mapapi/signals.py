@@ -1,8 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Collaboration, Notification
-from django.core.mail import send_mail
-#from .Send_mails import send_email
+from .Send_mails import send_email
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,7 +20,7 @@ def notify_organisation_on_collaboration(sender, instance, created, **kwargs):
                     'incident_id': incident.id,
                     'organisation': user.organisation,
                 }
-                send_email(
+                send_email.delay(
                     subject='Nouvelle demande de collaboration',
                     template_name='emails/collaboration_request.html',
                     context=context,

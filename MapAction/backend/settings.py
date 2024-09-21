@@ -350,4 +350,4 @@ EMAIL_HOST = 'map-action.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'contact@map-action.com'
-EMAIL_HOST_PASSWORD = 'Equipes55'
+EMAIL_HOST_PASSWORD = 'MesEquipes55'

@@ -32,7 +32,7 @@ def notify_organisation_on_collaboration(sender, instance, created, **kwargs):
                 Notification.objects.create(
                     user=user,
                     message=f"Vous avez une nouvelle collaboration pour l'incident {incident.id}",
-                    collaboration=instance
+                    colaboration=instance
                 )
                 logger.info(f"Notification créée pour l'utilisateur {user.username}.")
                 

@@ -34,7 +34,7 @@ def notify_organisation_on_collaboration(sender, instance, created, **kwargs):
                     message=f"Vous avez une nouvelle collaboration pour l'incident {incident.id}",
                     colaboration=instance
                 )
-                logger.info(f"Notification créée pour l'utilisateur {user.username}.")
+                logger.info(f"Notification créée pour l'utilisateur {user.email}.")
                 
             except Exception as e:
                 logger.error(f"Erreur lors de l'envoi de l'email: {str(e)}")

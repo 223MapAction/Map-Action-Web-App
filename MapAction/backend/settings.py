@@ -349,6 +349,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'mail.map-action.com'
 EMAIL_USE_TLS = True  
 EMAIL_USE_SSL = False 
-EMAIL_PORT = 25
+EMAIL_PORT = 2525
 EMAIL_HOST_USER = 'contact@map-action.com'
 EMAIL_HOST_PASSWORD = 'Equipes55'

@@ -1,12 +1,12 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Collaboration, Notification
+from .models import Colaboration, Notification
 from .Send_mails import send_email
 import logging
 
 logger = logging.getLogger(__name__)
 
-@receiver(post_save, sender=Collaboration)
+@receiver(post_save, sender=Colaboration)
 def notify_organisation_on_collaboration(sender, instance, created, **kwargs):
     if created:
         incident = instance.incident

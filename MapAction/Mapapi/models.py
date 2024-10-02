@@ -334,6 +334,18 @@ class Collaboration(models.Model):
     user = models.ForeignKey(User, blank=False, null=False, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     end_date = models.DateField(blank=True)
+    
+# Collaboration table
+class Colaboration(models.Model):
+    incident = models.ForeignKey('Incident', blank=False, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=False, null=False, on_delete=models.CASCADE)
+    end_date = models.DateField()
+    motivation = models.TextField(blank=True, null=True)  
+    other_option = models.CharField(max_length=255, blank=True, null=True) 
+    status = models.CharField(max_length=20, default='pending')  
+
+    def __str__(self):
+        return f"Collaboration on {self.incident} by {self.user}"
 
 
 class Prediction(models.Model):

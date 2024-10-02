@@ -225,6 +225,11 @@ class CollaborationSerializer(serializers.ModelSerializer):
         model = Collaboration
         fields = '__all__'
 
+class ColaborationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Colaboration
+        fields = '__all__'
+
 class PredictionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prediction

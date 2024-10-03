@@ -2045,12 +2045,12 @@ def send_sms(phone_number, otp_code):
 
 class CollaborationView(generics.CreateAPIView, generics.ListAPIView):
     permission_classes = ()
-    queryset = Colaboration.objects.all()
-    serializer_class = ColaborationSerializer
+    queryset = Collaboration.objects.all()
+    serializer_class = CollaborationSerializer
 
     def post(self, request, *args, **kwargs):
         try:
-            serializer = ColaborationSerializer(data=request.data)
+            serializer = CollaborationSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             collaboration = serializer.save()
             

@@ -362,7 +362,7 @@ class Notification(models.Model):
     message = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
-    colaboration = models.ForeignKey(Colaboration, on_delete=models.CASCADE)
+    colaboration = models.ForeignKey(Collaboration, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.message

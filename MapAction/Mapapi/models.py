@@ -334,6 +334,9 @@ class Collaboration(models.Model):
     user = models.ForeignKey(User, blank=False, null=False, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     end_date = models.DateField(blank=True)
+    motivation = models.TextField(blank=True, null=True)  
+    other_option = models.CharField(max_length=255, blank=True, null=True) 
+    status = models.CharField(max_length=20, default='pending')
     
 # Collaboration table
 class Colaboration(models.Model):

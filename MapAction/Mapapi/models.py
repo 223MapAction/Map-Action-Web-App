@@ -353,8 +353,7 @@ class Prediction(models.Model):
     incident_id = models.CharField(max_length=255, blank=False, null=False)
     incident_type = models.CharField(max_length=255, blank=False, null=False)
     piste_solution = models.TextField(blank=False, null=False)
-    impact_potentiel = models.TextField(blank=False, null=False)
-    context = models.TextField(blank=False, null=False)
+    analysis = models.TextField(blank=False, null=False)
 
 
 class Notification(models.Model):

@@ -8,8 +8,8 @@ services:
       build:
         context: ./services/db/
       env_file:
-        - ./.env/.dev.env
-        #  - ~/.dev.env
+       # - ./.env/.dev.env
+        - ~/.dev.env
       ports:
         - "5432:5432"
       volumes:
@@ -37,8 +37,8 @@ services:
       expose:
         - 8000
       env_file:
-        - ./.env/.dev.env
-        #  - ~/.dev.env
+        #- ./.env/.dev.env
+         - ~/.dev.env
       #environment:
         #- ./.env/.dev.env
         #- SECRET_KEY=${SECRET_KEY}
@@ -115,7 +115,7 @@ services:
     build:
       context: .
       dockerfile: ./services/celery/Dockerfile.worker
-    command: celery -A backend worker --loglevel=info
+    command: celery -A backend worker --loglevel=debug
     volumes:
       - ~/celery_store:/celery-data
     depends_on:

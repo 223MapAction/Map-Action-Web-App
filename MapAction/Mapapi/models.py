@@ -334,14 +334,29 @@ class Collaboration(models.Model):
     user = models.ForeignKey(User, blank=False, null=False, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     end_date = models.DateField(blank=True)
+    motivation = models.TextField(blank=True, null=True)  
+    other_option = models.CharField(max_length=255, blank=True, null=True) 
+    status = models.CharField(max_length=20, default='pending')
+    
+# Collaboration table
+class Colaboration(models.Model):
+    incident = models.ForeignKey('Incident', blank=False, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=False, null=False, on_delete=models.CASCADE)
+    end_date = models.DateField()
+    motivation = models.TextField(blank=True, null=True)  
+    other_option = models.CharField(max_length=255, blank=True, null=True) 
+    status = models.CharField(max_length=20, default='pending')  
+
+    def __str__(self):
+        return f"Collaboration on {self.incident} by {self.user}"
+
 
 class Prediction(models.Model):
     prediction_id = models.CharField(max_length=255, blank=False, null=False)
     incident_id = models.CharField(max_length=255, blank=False, null=False)
     incident_type = models.CharField(max_length=255, blank=False, null=False)
     piste_solution = models.TextField(blank=False, null=False)
-    impact_potentiel = models.TextField(blank=False, null=False)
-    context = models.TextField(blank=False, null=False)
+    analysis = models.TextField(blank=False, null=False)
 
 
 class Notification(models.Model):

@@ -2089,7 +2089,7 @@ class AcceptCollaborationView(APIView):
                 message=notification_message,
                 colaboration=collaboration
             )
-            
+            notification.delete()
             return Response({"message": "Collaboration acceptée et notification envoyée"}, status=status.HTTP_200_OK)
         
         except Collaboration.DoesNotExist:

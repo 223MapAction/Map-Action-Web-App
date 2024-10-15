@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demande de Collaboration Acceptée</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #555;
+            line-height: 1.6;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Demande de Collaboration Acceptée</h1>
+        <p>Bonjour,</p>
+        <p>Nous avons le plaisir de vous informer que votre demande de collaboration sur l'incident <strong>{{ incident_id }}</strong> a été acceptée.</p>
+        <p>Cordialement,<br>L'équipe de Map Action</p>
+        <div class="footer">
+            <p>Si vous avez des questions, n'hésitez pas à nous contacter à <a href="mailto:contact@map-action.com">contact@map-action.com</a>.</p>
+        </div>
+    </div>
+</body>
+</html>

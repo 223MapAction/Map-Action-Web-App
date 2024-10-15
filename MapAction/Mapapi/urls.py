@@ -98,6 +98,7 @@ urlpatterns = [
     # OTP URL
     path('verify_otp/', PhoneOTPView.as_view(), name="verify_otp"),
     # Collaboration URL
+    path('collaboration/decline/', DeclineCollaborationView.as_view(), name='decline-collaboration'),
     path('collaborations/accept/', AcceptCollaborationView.as_view(), name='accept-collaboration'),
     path('collaboration/', CollaborationView.as_view(), name="collaboration"),
     path('collaboration/<int:collaboration_id>/<str:action>/', HandleCollaborationRequestView.as_view(), name="handle_collaboration_request"),

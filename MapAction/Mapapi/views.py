@@ -2071,16 +2071,29 @@ class AcceptCollaborationView(APIView):
             collaboration_id = request.data.get('collaboration_id')
             collaboration = Collaboration.objects.get(id=collaboration_id)
             requesting_user = collaboration.user
+            collaboration.status = 'accepted'
+            collaboration.save()
+            
             send_mail(
                 subject='Demande de collaboration acceptée',
                 message=f'Votre demande de collaboration sur l\'incident {collaboration.incident.id} a été acceptée.',
                 from_email='contact@map-action.com',
                 recipient_list=[requesting_user.email],
             )
-
-            return Response({"message": "Collaboration acceptée"}, status=status.HTTP_200_OK)
+            
+            notification_message = f'Votre demande de collaboration sur l\'incident {collaboration.incident.id} a été acceptée.'
+            Notification.objects.create(
+                user=requesting_user,
+                message=notification_message,
+                collaboration=collaboration
+            )
+            
+            return Response({"message": "Collaboration acceptée et notification envoyée"}, status=status.HTTP_200_OK)
+        
         except Collaboration.DoesNotExist:
             return Response({"error": "Collaboration non trouvée"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

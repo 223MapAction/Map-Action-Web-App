@@ -2351,3 +2351,44 @@ class HandleCollaborationRequestView(APIView):
         elif action == "reject":
             collaboration.delete()
             return Response({"status": "Collaboration rejected"}, status=status.HTTP_200_OK)
+            
+
+class DeclineCollaborationView(APIView):
+    permission_classes = ()
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            collaboration_id = request.data.get('collaboration_id')
+            collaboration = Collaboration.objects.get(id=collaboration_id)
+            requesting_user = collaboration.user
+            
+            collaboration.status = 'declined'
+            collaboration.save()
+            
+            send_email.delay(
+                subject='Demande de collaboration déclinée',
+                template_name='emails/decline_email.html',  
+                context={
+                    'incident_id': collaboration.incident.id,
+                    'organisation': requesting_user.organisation
+                },
+                to_email=requesting_user.email,
+            )
+            
+            notification_message = f'Votre demande de collaboration sur l\'incident {collaboration.incident.id} a été déclinée.'
+            notification = Notification.objects.create(
+                user=requesting_user,
+                message=notification_message,
+                colaboration=collaboration
+            )
+            
+            notification.delete()
+
+            return Response({"message": "Collaboration déclinée et notification supprimée."}, status=status.HTTP_200_OK)
+        
+        except Collaboration.DoesNotExist:
+            return Response({"error": "Collaboration non trouvée"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f"Erreur lors de la déclinaison de la collaboration: {str(e)}")
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

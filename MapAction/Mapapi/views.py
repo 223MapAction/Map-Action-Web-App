@@ -2185,7 +2185,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Notification.objects.filter(user=user)
+        return Notification.objects.filter(user=user, colaboration__status='pending')
 
     
 @extend_schema(

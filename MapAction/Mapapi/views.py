@@ -2074,11 +2074,13 @@ class AcceptCollaborationView(APIView):
             collaboration.status = 'accepted'
             collaboration.save()
             
-            send_mail(
+            send_email.delay(  
                 subject='Demande de collaboration acceptée',
-                message=f'Votre demande de collaboration sur l\'incident {collaboration.incident.id} a été acceptée.',
-                from_email='contact@map-action.com',
-                recipient_list=[requesting_user.email],
+                template_name='emails/collaboration_accept.html',  
+                context={
+                    'incident_id': collaboration.incident.id,
+                },
+                to_email=requesting_user.email,
             )
             
             notification_message = f'Votre demande de collaboration sur l\'incident {collaboration.incident.id} a été acceptée.'

@@ -2084,7 +2084,7 @@ class AcceptCollaborationView(APIView):
             )
             
             notification_message = f'Votre demande de collaboration sur l\'incident {collaboration.incident.id} a été acceptée.'
-            Notification.objects.create(
+            notification = Notification.objects.create(
                 user=requesting_user,
                 message=notification_message,
                 colaboration=collaboration

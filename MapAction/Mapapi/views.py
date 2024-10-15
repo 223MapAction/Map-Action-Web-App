@@ -2087,7 +2087,7 @@ class AcceptCollaborationView(APIView):
             Notification.objects.create(
                 user=requesting_user,
                 message=notification_message,
-                collaboration=collaboration
+                colaboration=collaboration
             )
             
             return Response({"message": "Collaboration acceptée et notification envoyée"}, status=status.HTTP_200_OK)

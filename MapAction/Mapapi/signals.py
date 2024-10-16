@@ -18,6 +18,9 @@ def notify_organisation_on_collaboration(sender, instance, created, **kwargs):
                 # Envoi de l'email à l'organisation
                 context = {
                     'incident_id': incident.id,
+                    'incident_title': incident.title,  
+                    'incident_zone': incident.zone,  
+                    'incident_creation_date': incident.created_at,  
                     'organisation': user.organisation,
                 }
                 send_email.delay(

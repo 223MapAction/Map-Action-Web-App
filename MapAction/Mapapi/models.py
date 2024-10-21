@@ -1,4 +1,3 @@
-
 from django.db import models
 
 # Create your models here.
@@ -357,6 +356,9 @@ class Prediction(models.Model):
     incident_type = models.CharField(max_length=255, blank=False, null=False)
     piste_solution = models.TextField(blank=False, null=False)
     analysis = models.TextField(blank=False, null=False)
+    ndvi_ndwi_plot = models.ImageField(upload_to='uploads/', null=True, blank=True)
+    ndvi_heatmap = models.ImageField(upload_to='uploads/', null=True, blank=True)
+    landcover_plot = models.ImageField(upload_to='uploads/', null=True, blank=True)
 
 
 class Notification(models.Model):

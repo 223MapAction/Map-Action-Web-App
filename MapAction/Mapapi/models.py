@@ -357,6 +357,9 @@ class Prediction(models.Model):
     incident_type = models.CharField(max_length=255, blank=False, null=False)
     piste_solution = models.TextField(blank=False, null=False)
     analysis = models.TextField(blank=False, null=False)
+    ndvi_heatmap = models.TextField(blank=True, null=True)
+    ndvi_ndwi_plot = models.TextField(blank=True, null=True)
+    landcover_plot = models.TextField(blank=True, null=True)
 
 
 class Notification(models.Model):

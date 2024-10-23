@@ -13,54 +13,10 @@ jobs:
         runs-on: self-hosted
 
         steps:
-            # 1. Checkout the Repository
             - name: Checkout Repository
               uses: actions/checkout@v2
 
-            # 2. List Repository Contents for Debugging
-            - name: List Repository Contents
-              run: |
-                  echo "Listing root directory:"
-                  ls -la
-                  echo "Listing MapAction directory:"
-                  ls -la MapAction
-
-            # 3. Stop and Remove Existing Containers and Volumes
-            - name: Stop and Remove Existing Containers and Volumes
-              working-directory: MapAction
-              run: |
-                  docker-compose -f _cd_pipeline.yml down -v --remove-orphans
-              continue-on-error: true # Proceed even if no containers are running
-
-            # 4. Build and Run Docker Compose
             - name: Build and Run Docker Compose
               working-directory: MapAction
               run: |
                   docker-compose -f _cd_pipeline.yml up --build -d
-
-            # 5. Wait for PostgreSQL to be Ready
-            - name: Wait for PostgreSQL to be Ready
-              run: |
-                  echo "Waiting for PostgreSQL to be ready..."
-                  for i in {1..30}; do
-                    docker-compose -f _cd_pipeline.yml exec postgres-db pg_isready -U your_user && break
-                    echo "PostgreSQL not ready yet. Waiting..."
-                    sleep 2
-                  done
-
-            # 6. Run Django Migrations
-            - name: Run Django Migrations
-              run: |
-                  docker-compose -f _cd_pipeline.yml exec api-server python manage.py migrate
-
-            # 7. Verify Database Tables (Optional Debugging Step)
-            - name: Verify Database Tables
-              run: |
-                  docker-compose -f _cd_pipeline.yml exec postgres-db psql -U your_user -d your_db -c "\dt"
-
-            # 8. Cleanup Docker (Optional but Recommended)
-            - name: Cleanup Docker
-              if: always()
-              run: |
-                  docker system prune -f
-                  docker volume prune -f

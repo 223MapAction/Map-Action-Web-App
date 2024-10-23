@@ -20,7 +20,7 @@ Map-Action-Web-App is a comprehensive solution that combines a robust API. This 
 ### Setup
 - Clone the repository
 - setup the virtual env first 
-it can be doing with the following command
+it can be doing with the following command:
 
 **On Linux, MacOS:**
 ```bash

@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         ('auth', '0012_alter_user_first_name_max_length'),
     ]
 
-    #operations = [
+    operations = [
         #migrations.CreateModel(
             #name='Category',
             #fields=[

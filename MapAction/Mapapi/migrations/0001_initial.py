@@ -14,16 +14,16 @@ class Migration(migrations.Migration):
         ('auth', '0012_alter_user_first_name_max_length'),
     ]
 
-    operations = [
-        migrations.CreateModel(
-            name='Category',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=250, unique=True)),
-                ('photo', models.ImageField(blank=True, null=True, upload_to='')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-            ],
-        ),
+    #operations = [
+        #migrations.CreateModel(
+            #name='Category',
+            #fields=[
+                #('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                #('name', models.CharField(max_length=250, unique=True)),
+                #('photo', models.ImageField(blank=True, null=True, upload_to='')),
+                #('created_at', models.DateTimeField(auto_now_add=True)),
+            #],
+        #),
         migrations.CreateModel(
             name='ChatHistory',
             fields=[
